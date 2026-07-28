@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="WutheringWavesBox.Contracts/WutheringWavesBox.Contracts.csproj" />
+  <Project Path="WutheringWavesBox.Helper/WutheringWavesBox.Helper.csproj" />
+  <Project Path="WutheringWavesBox.Helper.Tests/WutheringWavesBox.Helper.Tests.csproj" />
+</Solution>

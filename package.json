@@ -1,0 +1,51 @@
+{
+  "name": "wuthering-waves-box",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wuthering Waves desktop toolbox",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/aslingguang/WutheringWavesBox#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aslingguang/WutheringWavesBox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aslingguang/WutheringWavesBox/issues"
+  },
+  "type": "module",
+  "packageManager": "npm@11.13.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=@wwbox/desktop",
+    "build": "npm run build --workspace=@wwbox/contracts && npm run build --workspace=@wwbox/desktop",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build",
+    "release:helper": "dotnet publish native/WutheringWavesBox.Helper/WutheringWavesBox.Helper.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true --output apps/desktop/release-helper",
+    "release:win": "npm run release:helper && npm run build --workspace=@wwbox/contracts && npm run release:win --workspace=@wwbox/desktop",
+    "release:portable": "npm run release:helper && npm run build --workspace=@wwbox/contracts && npm run release:portable --workspace=@wwbox/desktop",
+    "helper:build": "dotnet build native/WutheringWavesBox.slnx",
+    "helper:test": "dotnet test native/WutheringWavesBox.slnx"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "electron": "43.1.1",
+    "eslint": "^10.0.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.6.2",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.1"
+  }
+}

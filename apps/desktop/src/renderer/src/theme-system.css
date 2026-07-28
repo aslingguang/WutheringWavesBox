@@ -1,0 +1,3078 @@
+/* Final, isolated theme layer. This file owns colors, typography, focus and stacking.
+   Component geometry remains in styles.css. */
+.shell {
+  --t-font: Inter, 'Microsoft YaHei UI', 'Microsoft YaHei', system-ui, sans-serif;
+  --t-font-size-control: var(--ui-type-control-size, 13px);
+  --t-font-weight-control: var(--ui-weight-medium, 600);
+  --t-text: #e7eef0;
+  --t-strong: #f6fafb;
+  --t-muted: #a5b4b9;
+  --t-disabled: #718287;
+  --t-panel: rgba(11, 24, 30, var(--panel-opacity));
+  --t-raised: rgba(15, 31, 38, var(--panel-opacity));
+  --t-control: rgba(8, 21, 27, 0.9);
+  --t-hover: rgba(38, 65, 73, 0.9);
+  --t-line: rgba(131, 170, 179, 0.3);
+  --t-divider: rgba(131, 170, 179, 0.18);
+  --t-accent: #69d5cd;
+  --t-accent-text: #071b20;
+  --t-danger: #ff9696;
+  --t-shadow: rgba(0, 0, 0, 0.3);
+  color: var(--t-text);
+  font-family: var(--t-font);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.shell.theme-glass {
+  --t-panel: rgba(12, 28, 34, calc(var(--panel-opacity) * 0.7));
+  --t-raised: rgba(17, 36, 43, calc(var(--panel-opacity) * 0.66));
+  --t-control: rgba(8, 24, 30, calc(0.32 + var(--panel-opacity) * 0.4));
+}
+.shell.theme-dark {
+  --t-panel: rgba(5, 12, 16, calc(var(--panel-opacity) * 0.84));
+  --t-raised: rgba(8, 18, 23, calc(var(--panel-opacity) * 0.8));
+  --t-control: rgba(6, 16, 21, calc(var(--panel-opacity) * 0.88));
+  --t-hover: rgba(28, 48, 55, max(0.26, var(--panel-opacity)));
+  --t-line: rgba(119, 153, 161, calc(0.16 + var(--panel-opacity) * 0.18));
+  --t-divider: rgba(119, 153, 161, calc(0.1 + var(--panel-opacity) * 0.12));
+}
+.shell.theme-light {
+  --t-text: #1c292e;
+  --t-strong: #0e171b;
+  --t-muted: #4b5f66;
+  --t-disabled: #829197;
+  --t-panel: rgba(247, 250, 251, calc(0.55 + var(--panel-opacity) * 0.28));
+  --t-raised: rgba(252, 253, 253, calc(0.64 + var(--panel-opacity) * 0.25));
+  --t-control: rgba(249, 251, 252, 0.9);
+  --t-hover: rgba(226, 237, 239, 0.94);
+  --t-line: rgba(48, 76, 84, 0.23);
+  --t-divider: rgba(48, 76, 84, 0.14);
+  --t-accent: #197d80;
+  --t-accent-text: #f8ffff;
+  --t-danger: #a7353e;
+  --t-shadow: rgba(49, 69, 75, 0.16);
+}
+.shell,
+.shell :is(button, input, select, textarea) {
+  font-family: var(--t-font);
+}
+.shell :is(button, input, select, textarea),
+.dialog-surface :is(button, input, select, textarea) {
+  font-family: var(--t-font);
+  font-size: var(--t-font-size-control);
+  font-weight: var(--t-font-weight-control);
+  letter-spacing: 0;
+}
+.shell :is(h1, h2, h3, h4, h5, h6, strong, b, th, legend, summary) {
+  color: var(--t-strong);
+}
+.shell :is(p, small, time, label, .subtitle, .eyebrow, .muted, .hint) {
+  color: var(--t-muted);
+}
+.shell :is(input, select, textarea) {
+  border-color: var(--t-line) !important;
+  border-radius: 10px !important;
+  color: var(--t-text) !important;
+  background: var(--t-control) !important;
+  caret-color: var(--t-accent);
+}
+.shell.theme-glass .settings-card :is(select, input[type='range']) {
+  background: transparent !important;
+  backdrop-filter: blur(10px) saturate(1.1);
+}
+.shell.theme-light :is(input, select, textarea) {
+  color-scheme: light;
+}
+.shell:not(.theme-light) :is(input, select, textarea) {
+  color-scheme: dark;
+}
+.shell :is(input, textarea)::placeholder {
+  color: var(--t-disabled) !important;
+  opacity: 1;
+}
+.shell select :is(option, optgroup) {
+  color: var(--t-text);
+  background: var(--t-raised);
+}
+.shell :is(input, select, textarea, button):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--t-accent) 74%, transparent) !important;
+  outline-offset: 2px;
+}
+.shell :is(input, select, textarea, button):disabled {
+  color: var(--t-disabled) !important;
+}
+.shell button:disabled,
+.modal-theme-host button:disabled,
+body > div button:disabled {
+  cursor: default !important;
+}
+.shell button:not(.primary-button):not(.danger-button) {
+  border-color: var(--t-line) !important;
+  color: var(--t-text) !important;
+  background: var(--t-control) !important;
+}
+.shell button:not(.primary-button):not(.danger-button):hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--t-accent) 72%, transparent) !important;
+  color: var(--t-strong) !important;
+  background: var(--t-hover) !important;
+}
+.shell .primary-button {
+  color: var(--t-accent-text) !important;
+}
+.shell :is(.danger-text, .danger-button, .error, .error-detail) {
+  color: var(--t-danger) !important;
+}
+
+/* Primary surfaces */
+.shell
+  :is(
+    article,
+    .settings-card,
+    .account-modal,
+    .profile-form,
+    .current-account,
+    .game-card,
+    .account-card,
+    .quick-card,
+    .player-metric-grid > div,
+    .battle-pass-block,
+    .gacha-commandbar,
+    .luck-summary,
+    .pool-card,
+    .detail-view,
+    .gacha-table-wrap,
+    .version-manager-panel,
+    .version-summary-list > article
+  ) {
+  border-color: var(--t-line) !important;
+  color: var(--t-text) !important;
+  background-color: var(--t-panel) !important;
+  background-image: none !important;
+}
+.shell
+  :is(
+    .setting-row,
+    .setting-select-row,
+    .switch-row,
+    .wallpaper-controls,
+    .wallpaper-controls > label,
+    .snapshot-settings,
+    .snapshot-settings > div,
+    .gacha-uid-select,
+    .url-field,
+    .url-history,
+    .pool-card > header,
+    .pool-stats,
+    .pool-card li,
+    .detail-hero,
+    .detail-metrics > div,
+    .table-pagination,
+    .table-page-settings,
+    .version-editor,
+    .version-summary-list > article > header
+  ) {
+  border-color: var(--t-divider) !important;
+  color: var(--t-text) !important;
+  background-color: var(--t-raised) !important;
+  background-image: none !important;
+}
+.shell.theme-glass
+  :is(
+    .sidebar,
+    article,
+    .settings-card,
+    .account-modal,
+    .profile-form,
+    .account-card,
+    .quick-card,
+    .player-metric-grid > div,
+    .battle-pass-block,
+    .gacha-commandbar,
+    .luck-summary,
+    .pool-card,
+    .detail-view,
+    .gacha-table-wrap,
+    .version-manager-panel,
+    .version-summary-list > article
+  ) {
+  backdrop-filter: blur(20px) saturate(1.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+.shell.theme-dark :is(article, .settings-card, .account-modal, .gacha-commandbar) {
+  backdrop-filter: none;
+  box-shadow: none;
+}
+.shell.theme-dark::before {
+  background: rgba(2, 6, 8, calc(var(--panel-opacity) * 0.66));
+}
+.shell.theme-light::before {
+  background: rgba(238, 244, 246, 0.36);
+}
+
+/* Settings keep one surface per card; rows remain calm and transparent. */
+.shell
+  .settings-grid
+  > .settings-card
+  :is(
+    .button-row,
+    .wallpaper-controls,
+    .wallpaper-controls > label,
+    .setting-row,
+    .setting-select-row,
+    .switch-row
+  ) {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none;
+}
+.shell
+  .settings-grid
+  > .settings-card
+  :is(.wallpaper-controls > label, .setting-row, .setting-select-row, .switch-row) {
+  border-color: var(--t-divider) !important;
+}
+
+/* Selected states */
+.shell .theme-choices button {
+  background: transparent !important;
+}
+.shell.theme-glass .theme-choices button.active {
+  border-color: rgba(105, 213, 205, 0.8) !important;
+  color: #effffd !important;
+  background: rgba(49, 124, 122, 0.5) !important;
+}
+.shell.theme-dark .theme-choices button.active {
+  border-color: #52aaa5 !important;
+  color: #f1fffd !important;
+  background: rgba(34, 82, 82, max(0.5, var(--panel-opacity))) !important;
+}
+.shell.theme-light .theme-choices button.active {
+  border-color: rgba(34, 64, 71, 0.3) !important;
+  color: #0d171a !important;
+  background: #f1f2f2 !important;
+}
+.shell .nav-item.active {
+  border-color: color-mix(in srgb, var(--t-accent) 68%, transparent) !important;
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--t-accent) 24%, var(--t-panel)) !important;
+  box-shadow: inset 3px 0 0 var(--t-accent);
+}
+.shell .nav-item.active * {
+  color: var(--t-strong) !important;
+}
+.shell.theme-light > .sidebar {
+  color: var(--t-text);
+  background: rgba(247, 250, 251, 0.66) !important;
+  backdrop-filter: blur(18px) saturate(1.06);
+}
+.shell.theme-light .nav-item {
+  color: #26393f !important;
+  background: rgba(255, 255, 255, 0.48) !important;
+}
+.shell.theme-light .nav-item * {
+  color: inherit !important;
+}
+.shell.theme-light .nav-item.active {
+  color: #0c1619 !important;
+  background: #f1f2f2 !important;
+  box-shadow:
+    inset 3px 0 0 var(--t-accent),
+    0 6px 18px var(--t-shadow);
+}
+
+/* Tables */
+.shell table {
+  color: var(--t-text);
+  background: transparent !important;
+}
+.shell :is(th, td) {
+  border-color: var(--t-divider) !important;
+}
+.shell :is(thead, th) {
+  color: var(--t-strong);
+  background: var(--t-raised) !important;
+}
+.shell tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--t-raised) 45%, transparent);
+}
+.shell tbody tr:hover {
+  background: var(--t-hover);
+}
+
+/* Popovers are deliberately more opaque than cards to prevent text bleed-through. */
+.shell
+  :is(
+    .gacha-content,
+    .gacha-content > header,
+    .gacha-header-tools,
+    .gacha-commandbar,
+    .url-input-group
+  ) {
+  overflow: visible !important;
+}
+.shell :is(.gacha-header-tools, .gacha-commandbar) {
+  position: relative;
+  z-index: 300;
+}
+.shell :is(.snapshot-settings, .gacha-uid-select, .url-history, .table-page-settings)[open] {
+  position: relative;
+  z-index: 30020 !important;
+}
+.shell
+  :is(
+    .snapshot-settings > div,
+    .gacha-uid-options,
+    .url-history-popover,
+    .url-history-empty,
+    .table-page-settings > div
+  ) {
+  z-index: 30030 !important;
+  border-color: var(--t-line) !important;
+  border-radius: 12px !important;
+  color: var(--t-text) !important;
+  background: rgba(13, 29, 35, 0.98) !important;
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.46);
+  isolation: isolate;
+}
+.shell.theme-dark
+  :is(
+    .snapshot-settings > div,
+    .gacha-uid-options,
+    .url-history-popover,
+    .url-history-empty,
+    .table-page-settings > div
+  ) {
+  background: rgba(6, 16, 21, 0.985) !important;
+}
+.shell.theme-light
+  :is(
+    .snapshot-settings > div,
+    .gacha-uid-options,
+    .url-history-popover,
+    .url-history-empty,
+    .table-page-settings > div
+  ) {
+  color: #17252a !important;
+  background: rgba(251, 253, 253, 0.985) !important;
+  box-shadow: 0 20px 48px rgba(47, 67, 73, 0.2);
+}
+.shell.theme-light
+  :is(
+    .snapshot-settings > div,
+    .gacha-uid-options,
+    .url-history-popover,
+    .url-history-empty,
+    .table-page-settings > div
+  )
+  * {
+  color: inherit;
+}
+.shell .analysis-capture-area {
+  position: relative;
+  z-index: 1;
+}
+.modal-backdrop,
+.dialog-backdrop {
+  z-index: 40000 !important;
+}
+.account-modal,
+.version-conflict-modal {
+  position: relative;
+  z-index: 40010;
+}
+
+/* Preserve semantic rarity colors with suitable light-mode contrast. */
+.shell.theme-light .quality-5 {
+  color: #845800 !important;
+}
+.shell.theme-light .quality-4 {
+  color: #69438a !important;
+}
+.shell.theme-light .quality-3 {
+  color: #166b76 !important;
+}
+
+/* Shape, spacing and state system ------------------------------------------------ */
+.shell {
+  --t-radius-control: 10px;
+  --t-radius-panel: 15px;
+  --t-radius-dialog: 20px;
+}
+.shell :is(button, input:not([type='checkbox']):not([type='range']), select, textarea, summary) {
+  border-radius: var(--t-radius-control) !important;
+}
+.shell
+  :is(
+    article,
+    .settings-card,
+    .game-card,
+    .account-card,
+    .quick-card,
+    .player-dashboard-card,
+    .luck-summary,
+    .pool-card,
+    .detail-view,
+    .gacha-commandbar,
+    .gacha-table-wrap,
+    .version-manager-panel,
+    .version-summary-list > article,
+    .wallpaper-preview
+  ) {
+  border-radius: var(--t-radius-panel) !important;
+}
+.shell :is(button, input:not([type='checkbox']):not([type='range']), select, textarea, summary) {
+  min-height: 36px;
+  padding-block: 7px;
+  padding-inline: 11px;
+  line-height: 1.35;
+}
+.shell :is(.nav-item, .theme-choices button, .analysis-tabs button, .tab-bar button) {
+  padding-inline: 12px;
+}
+.shell :is(.setting-row, .setting-select-row, .switch-row, .wallpaper-controls > label) {
+  min-height: 50px;
+  padding: 10px 12px;
+}
+.shell :is(.setting-row, .setting-select-row, .switch-row) > span {
+  min-width: 0;
+  padding-inline: 2px 12px;
+}
+.shell :is(.setting-row, .setting-select-row, .switch-row) :is(strong, small),
+.shell .wallpaper-controls > label {
+  line-height: 1.45;
+}
+.shell :is(.player-metric-grid > div, .detail-metrics > div, .pool-card li) {
+  border-radius: 11px !important;
+}
+.shell :is(.analysis-tabs, .tab-bar, .theme-choices, .button-row) {
+  border-radius: 12px !important;
+}
+
+/* Every selected state has an unmistakable background, border and text contrast. */
+.shell
+  :is(
+    .nav-item.active,
+    .theme-choices button.active,
+    .analysis-tabs button.active,
+    .tab-bar button.active,
+    .table-pool-filter button.active,
+    .detail-view aside button.active,
+    .player-switcher button.active,
+    .account-card.active
+  ) {
+  border-color: color-mix(in srgb, var(--t-accent) 82%, transparent) !important;
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--t-accent) 32%, var(--t-raised)) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--t-accent) 34%, transparent),
+    0 4px 14px color-mix(in srgb, var(--t-accent) 16%, transparent) !important;
+}
+.shell
+  :is(
+    .nav-item.active,
+    .theme-choices button.active,
+    .analysis-tabs button.active,
+    .tab-bar button.active,
+    .table-pool-filter button.active,
+    .detail-view aside button.active,
+    .player-switcher button.active,
+    .account-card.active
+  )
+  * {
+  color: inherit !important;
+}
+.shell.theme-light
+  :is(
+    .nav-item.active,
+    .theme-choices button.active,
+    .analysis-tabs button.active,
+    .tab-bar button.active,
+    .table-pool-filter button.active,
+    .detail-view aside button.active,
+    .player-switcher button.active,
+    .account-card.active
+  ) {
+  border-color: rgba(25, 82, 84, 0.42) !important;
+  color: #0a1719 !important;
+  background: #f1f2f2 !important;
+  box-shadow:
+    inset 3px 0 0 var(--t-accent),
+    0 5px 16px rgba(43, 67, 72, 0.14) !important;
+}
+.shell :is(.danger-text, .text-button) {
+  border-radius: 9px !important;
+}
+
+/* Dialogs and popovers ---------------------------------------------------------- */
+.shell {
+  --dialog-bg: rgba(12, 28, 34, clamp(0.42, calc(0.26 + var(--panel-opacity) * 0.62), 0.92));
+  --dialog-raised: transparent;
+  --dialog-control: transparent;
+  --dialog-text: #f0f8f9;
+  --dialog-muted: #afc3c8;
+  --dialog-line: #668790;
+  --dialog-accent: #73ded6;
+  --dialog-shadow: 0 24px 68px rgba(0, 0, 0, 0.72);
+}
+.shell.theme-dark {
+  --dialog-bg: rgba(5, 15, 20, clamp(0.58, calc(0.4 + var(--panel-opacity) * 0.5), 0.94));
+  --dialog-raised: transparent;
+  --dialog-control: transparent;
+  --dialog-text: #f1f8f9;
+  --dialog-muted: #a6bac0;
+  --dialog-line: #486872;
+  --dialog-accent: #68d0ca;
+  --dialog-shadow: 0 24px 68px rgba(0, 0, 0, 0.82);
+}
+.shell.theme-light {
+  --dialog-bg: rgba(251, 253, 253, clamp(0.72, calc(0.58 + var(--panel-opacity) * 0.34), 0.96));
+  --dialog-raised: transparent;
+  --dialog-control: transparent;
+  --dialog-text: #14262b;
+  --dialog-muted: #50666d;
+  --dialog-line: #94aab0;
+  --dialog-accent: #167b7e;
+  --dialog-shadow: 0 22px 58px rgba(34, 53, 59, 0.3);
+}
+.modal-backdrop,
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.modal-theme-host {
+  position: fixed;
+  inset: 0;
+  z-index: 40000;
+  width: 0;
+  height: 0;
+  isolation: isolate;
+}
+.modal-theme-host > .modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1 !important;
+}
+.shell.theme-light ~ :is(.modal-backdrop, .dialog-backdrop),
+.theme-light :is(.modal-backdrop, .dialog-backdrop) {
+  background: transparent !important;
+}
+.dialog-surface,
+.account-modal,
+.version-conflict-modal {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: min(360px, calc(100vw - 32px));
+  max-width: min(920px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+  border: 1px solid var(--dialog-line) !important;
+  border-radius: var(--t-radius-dialog) !important;
+  color: var(--dialog-text) !important;
+  background: var(--dialog-bg) !important;
+  box-shadow: var(--dialog-shadow) !important;
+}
+.dialog-surface {
+  overflow: auto;
+  border-color: var(--dialog-line) !important;
+  border-radius: 13px !important;
+  color: var(--dialog-text) !important;
+  background: var(--dialog-bg) !important;
+  box-shadow: var(--dialog-shadow) !important;
+  backdrop-filter: blur(24px) saturate(1.18) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.18) !important;
+}
+.dialog-surface > header {
+  border-bottom: 1px solid var(--dialog-line);
+  background: var(--dialog-raised);
+}
+.dialog-surface > header > button:last-child {
+  display: grid !important;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  padding: 0 !important;
+  border: 1px solid var(--dialog-line) !important;
+  border-radius: 9px !important;
+  color: var(--dialog-text) !important;
+  background: var(--dialog-control) !important;
+  font-size: 20px;
+  line-height: 1;
+}
+.version-manager-backdrop .version-manager-panel {
+  position: relative;
+  inset: auto;
+  width: min(880px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  transform: none;
+}
+.version-manager-backdrop .version-manager-panel > :not(header) {
+  margin-inline: 18px;
+}
+.version-manager-backdrop .version-manager-panel > header {
+  padding: 16px 18px;
+}
+.version-manager-backdrop .version-manager-list {
+  margin-bottom: 18px;
+}
+.account-modal > header,
+.version-conflict-modal > header {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--dialog-line);
+  background: var(--dialog-raised);
+}
+.account-modal > :is(.manager-layout, .account-layout),
+.version-conflict-modal > :not(header):not(footer) {
+  padding: 16px 18px;
+}
+.account-modal > footer,
+.version-conflict-modal > footer {
+  padding: 13px 18px;
+  border-top: 1px solid var(--dialog-line);
+  background: var(--dialog-raised);
+}
+.account-modal :is(.account-card, .profile-form),
+.version-conflict-modal :is(.version-conflicts, .version-conflicts > div) {
+  border-color: var(--dialog-line) !important;
+  border-radius: 12px !important;
+  background: var(--dialog-raised) !important;
+}
+.account-modal :is(p, small),
+.version-conflict-modal :is(p, small) {
+  color: var(--dialog-muted) !important;
+}
+.dialog-surface :is(input, textarea, select) {
+  border-color: var(--dialog-line) !important;
+  color: var(--dialog-text) !important;
+  background: var(--dialog-control) !important;
+}
+.dialog-surface :is(p, small, label, .subtitle, .eyebrow, .muted, .hint) {
+  color: var(--dialog-muted) !important;
+}
+.dialog-surface :is(h1, h2, h3, h4, strong, b) {
+  color: var(--dialog-text) !important;
+}
+.dialog-surface * {
+  background: transparent !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.dialog-surface > :is(header, footer) {
+  border-color: var(--dialog-line) !important;
+}
+.dialog-surface.account-editor-dialog {
+  overflow: clip !important;
+  overscroll-behavior: none;
+}
+.dialog-surface.account-editor-dialog
+  :is(input, textarea, select, button, .themed-select-control, .themed-select-display) {
+  box-shadow: none !important;
+  transform: none !important;
+}
+.dialog-surface.account-editor-dialog :is(input, textarea, select, button):focus-visible {
+  outline-offset: -2px !important;
+}
+
+.shell
+  :is(
+    .gacha-uid-options,
+    .url-history-popover,
+    .url-history-empty,
+    .snapshot-settings > div,
+    .table-page-settings > div
+  ) {
+  overflow: hidden;
+  padding: 9px;
+  border: 1px solid var(--t-line) !important;
+  border-radius: 13px !important;
+}
+.shell :is(.gacha-uid-options > button, .url-history-row) {
+  min-height: 42px;
+  padding: 8px 10px;
+  border-radius: 9px !important;
+}
+.shell .url-history-popover > header {
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--t-divider);
+}
+.shell :is(.snapshot-settings > div, .table-page-settings > div) :is(label, small) {
+  padding-inline: 2px;
+}
+
+/* Remove isolated square corners left by segmented legacy controls. */
+.shell .url-input-group > :first-child,
+.shell .url-input-group > :last-child,
+.shell .analysis-tabs > :first-child,
+.shell .analysis-tabs > :last-child,
+.shell .theme-choices > :first-child,
+.shell .theme-choices > :last-child {
+  border-radius: var(--t-radius-control) !important;
+}
+.shell .pool-card > header {
+  border-radius: calc(var(--t-radius-panel) - 1px) calc(var(--t-radius-panel) - 1px) 0 0;
+}
+.shell .snapshot-settings[open] > summary {
+  border-radius: var(--t-radius-control) var(--t-radius-control) 0 0 !important;
+}
+
+/* Native top-layer popovers: they cannot be clipped or covered by application content. */
+.snapshot-settings > button {
+  anchor-name: --snapshot-trigger;
+}
+.gacha-uid-select > .gacha-popover-trigger {
+  anchor-name: --uid-trigger;
+}
+.url-history > .gacha-popover-trigger {
+  anchor-name: --history-trigger;
+}
+.table-page-settings > button {
+  anchor-name: --pagination-trigger;
+}
+.shell [popover] {
+  inset: auto;
+  margin: 8px 0 0;
+  color: var(--t-text);
+  background: rgba(12, 28, 34, 0.985) !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.56) !important;
+}
+.shell [popover]::backdrop {
+  background: transparent;
+}
+.shell.theme-dark [popover] {
+  background: rgba(5, 15, 20, 0.99) !important;
+}
+.shell.theme-light [popover] {
+  color: #17252a;
+  background: rgba(251, 253, 253, 0.995) !important;
+  box-shadow: 0 24px 64px rgba(38, 57, 63, 0.26) !important;
+}
+.snapshot-settings-popover {
+  position-anchor: --snapshot-trigger;
+  position-area: bottom span-left;
+  width: max-content;
+  min-width: min(400px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+}
+.gacha-uid-options {
+  position-anchor: --uid-trigger;
+  position-area: bottom span-right;
+  width: min(300px, calc(100vw - 32px));
+}
+.url-history-popover,
+.url-history-empty {
+  position-anchor: --history-trigger;
+  position-area: bottom span-left;
+  width: min(430px, calc(100vw - 32px));
+}
+.table-page-settings-popover {
+  position-anchor: --pagination-trigger;
+  position-area: top span-left;
+  width: min(260px, calc(100vw - 32px));
+}
+.gacha-popover-trigger {
+  display: grid;
+  align-items: center;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  width: 100%;
+}
+.gacha-popover-trigger b {
+  text-align: right;
+}
+
+/* Gacha analysis corrections -------------------------------------------------- */
+/* Author display rules must never override the browser's closed popover state. */
+.shell [popover]:not(:popover-open) {
+  display: none !important;
+}
+.shell [popover]:popover-open {
+  visibility: visible;
+}
+
+/* Overview cards retain breathing room at every nested boundary. */
+.shell .pool-card.reference-pool {
+  padding: 12px !important;
+}
+.shell .pool-card.reference-pool > header {
+  padding: 12px 14px !important;
+  border: 1px solid var(--t-divider) !important;
+  border-radius: 11px !important;
+}
+.shell .pool-card.reference-pool .pool-stats {
+  gap: 8px;
+  margin: 10px 0 !important;
+  padding: 11px 12px !important;
+  border: 1px solid var(--t-divider) !important;
+  border-radius: 11px !important;
+}
+.shell .pool-card.reference-pool ul {
+  display: grid;
+  gap: 8px;
+}
+.shell .pool-card.reference-pool li {
+  min-height: 58px;
+  padding: 9px 11px !important;
+  border-radius: 10px !important;
+}
+.shell .pool-card.reference-pool :is(.star-record-copy, .star-record-copy > *) {
+  min-width: 0;
+}
+
+/* Detail analysis uses the same semantic surfaces in every theme. */
+.shell {
+  --chart-five: #ddb85e;
+  --chart-four: #a978c5;
+  --chart-three: #389eaa;
+}
+.shell.theme-light {
+  --chart-five: #b47a13;
+  --chart-four: #8052a1;
+  --chart-three: #197986;
+}
+.shell .detail-view > article {
+  color: var(--t-text) !important;
+  background: var(--t-panel) !important;
+}
+.shell .detail-hero,
+.shell .detail-metrics > div,
+.shell .five-star-timeline > div {
+  border: 1px solid var(--t-divider) !important;
+  color: var(--t-text) !important;
+  background: var(--t-raised) !important;
+}
+.shell .detail-hero {
+  border-radius: 13px !important;
+}
+.shell .rarity-chart {
+  padding: 9px;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--t-strong) 14%, transparent),
+    0 8px 24px var(--t-shadow);
+}
+.shell .rarity-chart > span {
+  color: var(--t-strong) !important;
+  background: var(--t-panel) !important;
+  box-shadow: 0 0 0 1px var(--t-divider);
+}
+.shell .rarity-chart small,
+.shell .rarity-legend p,
+.shell .five-star-timeline small,
+.shell .detail-metrics span {
+  color: var(--t-muted) !important;
+}
+.shell .five-star-timeline > div {
+  min-height: 76px;
+  padding: 11px 12px !important;
+  border-radius: 11px !important;
+}
+.shell.theme-light .five-star-timeline > div :is(strong, b) {
+  color: var(--t-strong) !important;
+}
+
+/* Sticky table headers are fully opaque and paint above scrolling records. */
+.shell .gacha-table-wrap {
+  overflow: auto;
+  isolation: isolate;
+  background: var(--t-panel) !important;
+}
+.shell .gacha-table-wrap table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.shell .gacha-table-wrap thead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.shell .gacha-table-wrap th {
+  position: static;
+  color: var(--t-strong) !important;
+  background: #10242b !important;
+  box-shadow:
+    0 1px 0 var(--t-line),
+    0 5px 12px var(--t-shadow);
+}
+.shell.theme-dark .gacha-table-wrap th {
+  background: #08171d !important;
+}
+.shell.theme-light .gacha-table-wrap th {
+  background: #f4f8f9 !important;
+}
+.shell .gacha-table-wrap tbody {
+  position: relative;
+  z-index: 1;
+}
+
+/* Final gacha contrast and overlap fixes ------------------------------------- */
+.shell .pool-card.reference-pool .pool-stats b {
+  font-size: 13px !important;
+  line-height: 1.25;
+}
+.shell .pool-card.reference-pool .pool-stats span {
+  font-size: 11.5px !important;
+  line-height: 1.35;
+}
+
+/* UP/lost badges use opaque semantic colors, independent of the card beneath. */
+.shell :is(.star-record-copy > small, .star-badge).is-up {
+  border: 1px solid #51c8a5 !important;
+  color: #eafff8 !important;
+  background: #176650 !important;
+  box-shadow: none;
+}
+.shell :is(.star-record-copy > small, .star-badge).is-lost {
+  border: 1px solid #e9787d !important;
+  color: #fff2f2 !important;
+  background: #8b343c !important;
+  box-shadow: none;
+}
+.shell.theme-light :is(.star-record-copy > small, .star-badge).is-up {
+  border-color: #087358 !important;
+  color: #ffffff !important;
+  background: #087358 !important;
+}
+.shell.theme-light :is(.star-record-copy > small, .star-badge).is-lost {
+  border-color: #a52f3b !important;
+  color: #ffffff !important;
+  background: #a52f3b !important;
+}
+
+/* The pagination bar remains visible while the opaque surface hides passing rows. */
+.shell .gacha-table-wrap .table-pagination {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 40;
+  border-color: var(--t-line) !important;
+  color: var(--t-muted) !important;
+  background: #10242b !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 -1px 0 var(--t-divider);
+}
+.shell.theme-dark .gacha-table-wrap .table-pagination {
+  background: #08171d !important;
+}
+.shell.theme-light .gacha-table-wrap .table-pagination {
+  background: #f4f8f9 !important;
+}
+.shell .gacha-table-wrap .table-pagination b {
+  color: var(--t-strong) !important;
+}
+
+/* Version item captions must remain legible on the compact light item tile. */
+.shell:not(.theme-light) .version-item-grid > div {
+  border: 1px solid color-mix(in srgb, var(--t-accent) 28%, var(--t-line)) !important;
+  color: #f2f7f7 !important;
+  background: #20363d !important;
+}
+.shell:not(.theme-light) .version-item-grid > div > :is(strong, b) {
+  color: #f2f7f7 !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+}
+.shell.theme-light .version-item-grid > div > :is(strong, b) {
+  color: #172126 !important;
+}
+
+/* Top-layer controls are intentionally solid: wallpaper and cards cannot bleed through. */
+.shell [popover]:popover-open {
+  border: 1px solid #52717a !important;
+  color: #edf6f7 !important;
+  background-color: #10262d !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.72) !important;
+}
+.shell.theme-dark [popover]:popover-open {
+  border-color: #405b64 !important;
+  color: #edf6f7 !important;
+  background-color: #07171d !important;
+}
+.shell.theme-light [popover]:popover-open {
+  border-color: #9aadb2 !important;
+  color: #17252a !important;
+  background-color: #fbfdfd !important;
+  box-shadow: 0 22px 58px rgba(35, 52, 58, 0.32) !important;
+}
+.shell [popover]:popover-open :is(label, span, strong, b, p) {
+  color: inherit !important;
+}
+.shell [popover]:popover-open :is(small, time) {
+  color: #a9bdc2 !important;
+}
+.shell.theme-light [popover]:popover-open :is(small, time) {
+  color: #51666d !important;
+}
+.shell [popover]:popover-open :is(input, select) {
+  border-color: #607c84 !important;
+  color: #f2f8f9 !important;
+  background: #0a1d23 !important;
+}
+.shell.theme-light [popover]:popover-open :is(input, select) {
+  border-color: #9aadb2 !important;
+  color: #17252a !important;
+  background: #ffffff !important;
+}
+.shell [popover]:popover-open option {
+  color: #edf6f7 !important;
+  background: #0a1d23 !important;
+}
+.shell.theme-light [popover]:popover-open option {
+  color: #17252a !important;
+  background: #ffffff !important;
+}
+
+/* Popover internals: reset legacy translucent/hover rules component by component. */
+.shell [popover]:popover-open {
+  position: fixed;
+  overflow: hidden !important;
+  padding: 10px !important;
+  border-radius: 13px !important;
+  forced-color-adjust: none;
+}
+.shell [popover]:popover-open :is(button, .url-history-row) {
+  border-color: transparent !important;
+  color: #eaf3f4 !important;
+  background: #18343c !important;
+  background-image: none !important;
+  opacity: 1 !important;
+}
+.shell [popover]:popover-open :is(button, .url-history-row):hover {
+  border-color: #69d5cd !important;
+  color: #ffffff !important;
+  background: #24515a !important;
+}
+.shell.theme-dark [popover]:popover-open :is(button, .url-history-row) {
+  color: #eaf3f4 !important;
+  background: #102a32 !important;
+}
+.shell.theme-dark [popover]:popover-open :is(button, .url-history-row):hover {
+  border-color: #65c7c2 !important;
+  color: #ffffff !important;
+  background: #1b444d !important;
+}
+.shell.theme-light [popover]:popover-open :is(button, .url-history-row) {
+  color: #17252a !important;
+  background: #edf3f4 !important;
+}
+.shell.theme-light [popover]:popover-open :is(button, .url-history-row):hover {
+  border-color: #197d80 !important;
+  color: #0c1b1f !important;
+  background: #d7e8e9 !important;
+}
+.shell [popover]:popover-open .url-history-row > button:first-child {
+  background: transparent !important;
+}
+.shell [popover]:popover-open .url-history-row :is(span, time) {
+  color: inherit !important;
+}
+.shell [popover]:popover-open .url-history-row i {
+  border: 1px solid currentColor;
+  color: #bff9ef !important;
+  background: #176650 !important;
+}
+.shell [popover]:popover-open .url-history-row i.custom {
+  color: #f2ddff !important;
+  background: #684589 !important;
+}
+.shell.theme-light [popover]:popover-open .url-history-row i.game {
+  color: #ffffff !important;
+  background: #087358 !important;
+}
+.shell.theme-light [popover]:popover-open .url-history-row i.custom {
+  color: #ffffff !important;
+  background: #704394 !important;
+}
+.shell [popover]:popover-open .history-delete {
+  color: #ffb7b7 !important;
+  background: transparent !important;
+}
+.shell [popover]:popover-open .history-delete:hover {
+  color: #ffffff !important;
+  background: #8b343c !important;
+}
+.shell.theme-light [popover]:popover-open .history-delete {
+  color: #a52f3b !important;
+  background: transparent !important;
+}
+.shell.theme-light [popover]:popover-open .history-delete:hover {
+  color: #ffffff !important;
+  background: #a52f3b !important;
+}
+.shell [popover]:popover-open > header {
+  border-color: #425f67 !important;
+  color: #f2f8f9 !important;
+  background: transparent !important;
+}
+.shell.theme-light [popover]:popover-open > header {
+  border-color: #b4c2c6 !important;
+  color: #17252a !important;
+}
+.shell [popover]:popover-open label {
+  color: #dce8ea !important;
+}
+.shell.theme-light [popover]:popover-open label {
+  color: #23363c !important;
+}
+
+/* Structural gacha layout: records scroll, controls never share the scroll plane. */
+.shell .pool-card.reference-pool .pool-stats {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px !important;
+  padding: 8px !important;
+}
+.shell .pool-card.reference-pool .pool-stats span {
+  gap: 2px;
+  min-width: 0;
+  padding-inline: 3px;
+  white-space: normal;
+  word-break: keep-all;
+}
+.shell .gacha-table-wrap {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-self: start;
+  max-height: none !important;
+  overflow: hidden !important;
+}
+.shell .gacha-table-scroll {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: clamp(320px, calc(100vh - 460px), 760px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  background: var(--t-panel);
+}
+.shell .gacha-table-wrap .table-pagination {
+  position: relative !important;
+  bottom: auto !important;
+  z-index: 1;
+  flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+.capturing-analysis .gacha-table-scroll {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Theme-owned top-layer popovers. data-theme remains available in the top layer. */
+[popover][data-theme]:popover-open {
+  box-sizing: border-box;
+  overflow: hidden !important;
+  padding: 10px !important;
+  border: 1px solid !important;
+  border-radius: 13px !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  isolation: isolate;
+}
+[popover][data-theme='glass']:popover-open {
+  border-color: #63838c !important;
+  color: #eff8f9 !important;
+  background: #133039 !important;
+  box-shadow: 0 24px 68px rgba(0, 0, 0, 0.7) !important;
+}
+[popover][data-theme='dark']:popover-open {
+  border-color: #4b6871 !important;
+  color: #eff8f9 !important;
+  background: #081a21 !important;
+  box-shadow: 0 24px 68px rgba(0, 0, 0, 0.78) !important;
+}
+[popover][data-theme='light']:popover-open {
+  border-color: #91a8ae !important;
+  color: #16272c !important;
+  background: #fbfdfd !important;
+  box-shadow: 0 22px 56px rgba(34, 54, 60, 0.3) !important;
+}
+[popover][data-theme]:popover-open :is(header, label, p, span, strong, b) {
+  color: inherit !important;
+}
+[popover][data-theme]:popover-open :is(small, time) {
+  color: #b3c7cc !important;
+}
+[popover][data-theme='light']:popover-open :is(small, time) {
+  color: #50676e !important;
+}
+[popover][data-theme]:popover-open :is(input, select) {
+  border: 1px solid #67858e !important;
+  color: #f4fafb !important;
+  background: #0b2027 !important;
+}
+[popover][data-theme='light']:popover-open :is(input, select) {
+  border-color: #96abb0 !important;
+  color: #16272c !important;
+  background: #ffffff !important;
+}
+[popover][data-theme]:popover-open option {
+  color: #f4fafb !important;
+  background: #0b2027 !important;
+}
+[popover][data-theme='light']:popover-open option {
+  color: #16272c !important;
+  background: #ffffff !important;
+}
+[popover][data-theme].gacha-uid-options:popover-open > button,
+[popover][data-theme]:popover-open .url-history-row {
+  border: 1px solid transparent !important;
+  color: inherit !important;
+  background: #1b3a43 !important;
+  background-image: none !important;
+}
+[popover][data-theme='dark'].gacha-uid-options:popover-open > button,
+[popover][data-theme='dark']:popover-open .url-history-row {
+  background: #102b33 !important;
+}
+[popover][data-theme='light'].gacha-uid-options:popover-open > button,
+[popover][data-theme='light']:popover-open .url-history-row {
+  background: #edf3f4 !important;
+}
+[popover][data-theme].gacha-uid-options:popover-open > button:hover,
+[popover][data-theme]:popover-open .url-history-row:hover {
+  border-color: #75ddd5 !important;
+  color: #ffffff !important;
+  background: #285863 !important;
+}
+[popover][data-theme='dark'].gacha-uid-options:popover-open > button:hover,
+[popover][data-theme='dark']:popover-open .url-history-row:hover {
+  background: #1c4650 !important;
+}
+[popover][data-theme='light'].gacha-uid-options:popover-open > button:hover,
+[popover][data-theme='light']:popover-open .url-history-row:hover {
+  border-color: #197d80 !important;
+  color: #102328 !important;
+  background: #d5e8e9 !important;
+}
+[popover][data-theme]:popover-open .url-history-row > button:first-child {
+  color: inherit !important;
+  background: transparent !important;
+}
+[popover][data-theme]:popover-open .url-history-row i.game {
+  border: 1px solid #64d4b4;
+  color: #effff9 !important;
+  background: #176650 !important;
+}
+[popover][data-theme]:popover-open .url-history-row i.custom {
+  border: 1px solid #c49ae1;
+  color: #fff7ff !important;
+  background: #684589 !important;
+}
+[popover][data-theme='light']:popover-open .url-history-row i.game {
+  border-color: #087358;
+  color: #ffffff !important;
+  background: #087358 !important;
+}
+[popover][data-theme='light']:popover-open .url-history-row i.custom {
+  border-color: #704394;
+  color: #ffffff !important;
+  background: #704394 !important;
+}
+
+/* Responsive analysis panels ------------------------------------------------- */
+.shell .pool-card.reference-pool .pool-stats {
+  gap: 4px !important;
+}
+.shell .pool-card.reference-pool .pool-stats :is(span, b) {
+  text-align: center;
+}
+.shell .pool-card.reference-pool .pool-stats span {
+  font-size: 10.5px !important;
+}
+.shell .pool-card.reference-pool .pool-stats b {
+  font-size: 12px !important;
+}
+
+.shell .analysis-scroll-content {
+  min-width: 0;
+  padding: 2px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.shell :is(.detail-view, .table-view) {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid var(--t-line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--t-panel) 88%, transparent);
+  box-sizing: border-box;
+}
+.shell .detail-view {
+  grid-template-columns: clamp(130px, 15vw, 180px) minmax(0, 1fr);
+}
+.shell .detail-view > article {
+  min-width: 0;
+  overflow: hidden;
+  padding: clamp(12px, 1.5vw, 18px) !important;
+  border-radius: 13px !important;
+}
+.shell .detail-view aside,
+.shell .table-pool-filter {
+  min-width: 0;
+  padding: 5px;
+  border: 1px solid var(--t-divider);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--t-raised) 72%, transparent);
+  box-sizing: border-box;
+}
+.shell .detail-view aside button,
+.shell .table-pool-filter button {
+  min-width: 0;
+  border-radius: 9px !important;
+}
+.shell .detail-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(105px, 100%), 1fr));
+}
+.shell .five-star-timeline {
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+}
+.shell .table-view {
+  grid-template-columns: clamp(140px, 16vw, 190px) minmax(0, 1fr);
+}
+.shell .gacha-table-wrap {
+  min-width: 0;
+  border-radius: 13px !important;
+  background: color-mix(in srgb, var(--t-panel) 94%, transparent) !important;
+}
+.shell .gacha-table-scroll {
+  width: 100%;
+  min-width: 0;
+  border-radius: 12px 12px 0 0;
+}
+.shell .gacha-table-wrap .table-pagination {
+  border-radius: 0 0 12px 12px;
+}
+@media (max-width: 900px) {
+  .shell :is(.detail-view, .table-view) {
+    grid-template-columns: 1fr;
+    padding: 8px;
+  }
+  .shell .detail-view aside,
+  .shell .table-pool-filter {
+    display: flex;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .shell .detail-view aside button,
+  .shell .table-pool-filter button {
+    min-width: 130px;
+  }
+}
+@media (max-width: 620px) {
+  .shell .detail-hero {
+    justify-content: center;
+  }
+  .shell .rarity-legend {
+    width: 100%;
+    text-align: center;
+  }
+  .shell .table-pagination {
+    grid-template-columns: 1fr auto;
+  }
+  .shell .table-pagination > div:first-of-type {
+    grid-column: 1/-1;
+    justify-content: center;
+  }
+}
+
+/* Version summary result badges. */
+.shell .version-item-grid .version-status-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 2px 6px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: #ffffff !important;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.25;
+  text-shadow: none;
+}
+.shell .version-item-grid .version-status-badge.is-up {
+  background: #087358 !important;
+}
+.shell .version-item-grid .version-status-badge.is-lost {
+  background: #a5323d !important;
+}
+.shell .version-item-grid .version-status-badge.is-unknown {
+  color: #1b2528 !important;
+  background: #d4aa4f !important;
+}
+
+/* Compact-window containment: mode panels own their scrolling areas. */
+.shell .analysis-scroll-content:has(> .detail-view),
+.shell .analysis-scroll-content:has(> .table-view) {
+  overflow: hidden !important;
+}
+.shell :is(.detail-view, .table-view) {
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+.shell .detail-view > article {
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.shell .detail-view aside {
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.shell .table-view {
+  grid-template-rows: minmax(0, 1fr);
+}
+.shell .table-pool-filter {
+  max-height: 100%;
+}
+.shell .table-view .gacha-table-wrap {
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.shell .table-view .gacha-table-scroll {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+.shell :is(.gacha-table-header, .gacha-table-body) {
+  width: 100%;
+  table-layout: fixed;
+}
+.shell :is(.gacha-table-header, .gacha-table-body) :is(th, td):nth-child(1) {
+  width: 29%;
+}
+.shell :is(.gacha-table-header, .gacha-table-body) :is(th, td):nth-child(2) {
+  width: 23%;
+}
+.shell :is(.gacha-table-header, .gacha-table-body) :is(th, td):nth-child(3) {
+  width: 14%;
+}
+.shell :is(.gacha-table-header, .gacha-table-body) :is(th, td):nth-child(4) {
+  width: 13%;
+}
+.shell :is(.gacha-table-header, .gacha-table-body) :is(th, td):nth-child(5) {
+  width: 21%;
+}
+.shell .gacha-table-header {
+  position: relative;
+  z-index: 2;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+}
+.shell .gacha-table-header thead {
+  position: static;
+}
+.shell .gacha-table-scroll {
+  border-radius: 0 !important;
+}
+.shell .table-pagination {
+  min-width: 0;
+  gap: clamp(5px, 1vw, 12px);
+  padding: 8px 10px;
+}
+.shell .table-pagination > div {
+  min-width: 0;
+}
+.shell .table-pagination button {
+  min-width: 0;
+  padding-inline: clamp(6px, 0.8vw, 10px);
+}
+.shell .table-page-settings {
+  overflow: visible;
+  border: 0 !important;
+  border-radius: 11px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.shell .table-page-settings > button {
+  overflow: hidden;
+  border-radius: 10px !important;
+  background-clip: padding-box !important;
+}
+@media (max-width: 900px) {
+  .shell :is(.detail-view, .table-view) {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .shell .detail-view aside,
+  .shell .table-pool-filter {
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}
+@media (max-height: 700px) {
+  .shell :is(.detail-view, .table-view) {
+    padding: 7px;
+  }
+  .shell .detail-view > article {
+    padding: 10px !important;
+  }
+  .shell .detail-hero {
+    margin-bottom: 10px;
+    padding: 11px;
+  }
+  .shell .five-star-timeline {
+    margin-top: 10px;
+  }
+}
+
+/* Gacha option switches and self-contained high-contrast mode. */
+.shell .gacha-option-toggle {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--t-line);
+  border-radius: 10px;
+  color: var(--t-text) !important;
+  background: var(--t-control);
+  cursor: pointer;
+  user-select: none;
+}
+.shell .gacha-option-toggle:hover {
+  border-color: var(--t-accent);
+  background: var(--t-hover);
+}
+.shell .gacha-option-toggle input[type='checkbox'] {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  flex: 0 0 auto;
+  appearance: none;
+  margin: 0;
+  border: 1px solid var(--t-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--t-control) 75%, #59686d);
+  cursor: pointer;
+  transition: 0.16s ease;
+}
+.shell .gacha-option-toggle input[type='checkbox']::after {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--t-muted);
+  box-shadow: 0 1px 3px var(--t-shadow);
+  content: '';
+  transition: 0.16s ease;
+}
+.shell .gacha-option-toggle input[type='checkbox']:checked {
+  border-color: var(--t-accent);
+  background: var(--t-accent);
+}
+.shell .gacha-option-toggle input[type='checkbox']:checked::after {
+  left: 18px;
+  background: var(--t-accent-text);
+}
+
+.shell .gacha-content.gacha-high-contrast {
+  --t-text: #fff3df;
+  --t-strong: #fffaf0;
+  --t-muted: #d9c0a4;
+  --t-disabled: #9e826c;
+  --t-panel: #1b100c;
+  --t-raised: #2a1811;
+  --t-control: #160d09;
+  --t-hover: #4a2b1c;
+  --t-line: #806044;
+  --t-divider: #5a3b27;
+  --t-accent: #ffc13d;
+  --t-accent-text: #251300;
+  --t-danger: #ff7268;
+  --t-shadow: rgba(12, 5, 2, 0.8);
+  color: var(--t-text) !important;
+  background:
+    radial-gradient(circle at 18% 6%, rgba(143, 91, 48, 0.34), transparent 32%),
+    radial-gradient(circle at 86% 14%, rgba(93, 55, 31, 0.24), transparent 28%),
+    linear-gradient(145deg, rgba(41, 26, 18, 0.97), rgba(20, 12, 9, 0.985)) !important;
+}
+.shell .gacha-content.gacha-high-contrast,
+.shell
+  .gacha-content.gacha-high-contrast
+  :is(.luck-summary, .pool-card, .detail-view, .table-view, .version-summary-list > article) {
+  color-scheme: dark;
+}
+.shell
+  .gacha-content.gacha-high-contrast
+  :is(
+    .gacha-commandbar,
+    .luck-summary,
+    .pool-card,
+    .detail-view,
+    .detail-view > article,
+    .table-view,
+    .gacha-table-wrap,
+    .version-summary-list > article
+  ) {
+  border-color: var(--t-line) !important;
+  color: var(--t-text) !important;
+  background-color: var(--t-panel) !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+}
+.shell .gacha-content.gacha-high-contrast .luck-summary {
+  background:
+    radial-gradient(circle at 16% 0, #5b4130 0, transparent 48%),
+    linear-gradient(112deg, #2d1c14, #160e0b 76%) !important;
+  box-shadow: inset 0 0 44px rgba(255, 174, 61, 0.12) !important;
+}
+.shell .gacha-content.gacha-high-contrast .analysis-scroll-content {
+  background: rgba(20, 12, 9, 0.54) !important;
+}
+.shell
+  .gacha-content.gacha-high-contrast
+  :is(.pool-card, .detail-view, .table-view, .version-summary-list > article) {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 232, 193, 0.055),
+    0 12px 32px rgba(10, 4, 1, 0.3) !important;
+}
+.shell
+  .gacha-content.gacha-high-contrast
+  :is(
+    .analysis-tabs button.active,
+    .table-pool-filter button.active,
+    .detail-view aside button.active
+  ) {
+  border-color: #ffc13d !important;
+  color: #fff8e9 !important;
+  background: linear-gradient(135deg, #6b3d1d, #3c2214) !important;
+  box-shadow: inset 3px 0 0 #ffc13d !important;
+}
+.shell .gacha-content.gacha-high-contrast :is(.quality-5, .version-summary-list header b) {
+  color: #ffc34a !important;
+}
+.shell .gacha-content.gacha-high-contrast .quality-4 {
+  color: #e2a9ff !important;
+}
+.shell .gacha-content.gacha-high-contrast .quality-3 {
+  color: #73d8dc !important;
+}
+.shell .gacha-content.gacha-high-contrast :is(.luck-copy h2, .luck-copy strong, .luck-metrics b) {
+  color: #ffc34a !important;
+}
+.shell .gacha-content.gacha-high-contrast .pity-track > i.safe {
+  background: #ffc13d !important;
+}
+.shell .gacha-content.gacha-high-contrast .pity-track > i.warn {
+  background: #ff9f3d !important;
+}
+.shell .gacha-content.gacha-high-contrast .pity-track > i.danger {
+  background: #ff5f55 !important;
+}
+.shell
+  .gacha-content.gacha-high-contrast
+  :is(.pool-stats, .pool-card li, .detail-hero, .detail-metrics > div, .five-star-timeline > div) {
+  border-color: var(--t-divider) !important;
+  color: var(--t-text) !important;
+  background: var(--t-raised) !important;
+}
+.shell .gacha-content.gacha-high-contrast :is(h1, h2, h3, strong, b, th) {
+  color: var(--t-strong) !important;
+}
+.shell .gacha-content.gacha-high-contrast :is(p, small, time, label) {
+  color: var(--t-muted) !important;
+}
+.shell .gacha-content.gacha-high-contrast :is(span, td, li, dd, dt) {
+  color: var(--t-text) !important;
+  text-shadow: none !important;
+}
+.shell .gacha-content.gacha-high-contrast .pool-card.reference-pool {
+  border-color: var(--t-line) !important;
+  color: var(--t-text) !important;
+  background: var(--t-panel) !important;
+}
+.shell .gacha-content.gacha-high-contrast .pool-card.reference-pool > header,
+.shell .gacha-content.gacha-high-contrast .pool-card.reference-pool :is(.pool-stats, li) {
+  border-color: var(--t-divider) !important;
+  color: var(--t-text) !important;
+  background: var(--t-raised) !important;
+  background-image: none !important;
+}
+.shell .gacha-content.gacha-high-contrast .gacha-table-header :is(thead, tr, th) {
+  border-color: var(--t-divider) !important;
+  color: var(--t-strong) !important;
+  background: var(--t-control) !important;
+  background-image: none !important;
+}
+.shell .gacha-content.gacha-high-contrast .gacha-table-body tbody tr {
+  color: var(--t-text) !important;
+  background: var(--t-panel) !important;
+}
+.shell .gacha-content.gacha-high-contrast .gacha-table-body tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--t-raised) 58%, var(--t-panel)) !important;
+}
+.shell .gacha-content.gacha-high-contrast .gacha-table-body tbody tr:hover {
+  background: var(--t-hover) !important;
+}
+
+/* The table header is one rounded group; individual columns stay rectangular. */
+.shell .gacha-table-header {
+  border-radius: 12px 12px 0 0 !important;
+  overflow: hidden !important;
+}
+.shell .gacha-table-header th {
+  border-radius: 0 !important;
+}
+.shell .gacha-table-header th:first-child {
+  border-top-left-radius: 11px !important;
+}
+.shell .gacha-table-header th:last-child {
+  border-top-right-radius: 11px !important;
+}
+.shell .gacha-content.gacha-high-contrast :is(input, select, button:not(.primary-button)) {
+  border-color: var(--t-line) !important;
+  color: var(--t-text) !important;
+  background: var(--t-control) !important;
+}
+.shell .gacha-content.gacha-high-contrast :is(button, tr):hover {
+  background-color: var(--t-hover) !important;
+}
+.shell .gacha-content.gacha-high-contrast .high-contrast-toggle {
+  border-color: var(--t-accent) !important;
+  color: var(--t-strong) !important;
+  background: #4a2b1c !important;
+}
+
+/* Snapshot layouts are viewport captures, not unconstrained document exports. */
+.capturing-analysis .luck-help-button {
+  display: none !important;
+}
+
+/* html-to-image rasterizes translucent light surfaces into separate filter layers.
+   Flatten them during capture so those layers cannot cover or clip adjacent cards. */
+.capturing-analysis
+  .shell.theme-light
+  .gacha-content:not(.gacha-high-contrast)
+  .analysis-export-content[data-snapshot-ratio],
+.capturing-analysis
+  .shell.theme-light
+  .gacha-content:not(.gacha-high-contrast)
+  .analysis-export-content[data-snapshot-ratio]
+  * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  mix-blend-mode: normal !important;
+}
+.capturing-analysis
+  .shell.theme-light
+  .gacha-content:not(.gacha-high-contrast)
+  .analysis-export-content[data-snapshot-ratio]
+  :is(
+    .luck-summary,
+    .pool-card,
+    .pool-card > header,
+    .pool-stats,
+    .pool-card li,
+    .detail-view,
+    .detail-hero,
+    .detail-metrics > div,
+    .five-star-timeline > div,
+    .gacha-table-wrap,
+    .version-summary-list > article,
+    .version-summary-list > article > header
+  ) {
+  opacity: 1 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+.capturing-analysis
+  .shell.theme-light
+  .gacha-content:not(.gacha-high-contrast)
+  .analysis-export-content[data-snapshot-ratio]
+  :is(.pool-card, .pool-card > header, .pool-stats, .pool-card li) {
+  background-color: #fbfdfd !important;
+  background-image: none !important;
+}
+.capturing-analysis
+  .shell.theme-light
+  .gacha-content:not(.gacha-high-contrast)
+  .analysis-export-content[data-snapshot-ratio]
+  .pool-grid {
+  gap: 12px !important;
+  isolation: auto !important;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio] {
+  width: var(--snapshot-width) !important;
+  min-width: var(--snapshot-width) !important;
+  max-width: var(--snapshot-width) !important;
+  height: var(--snapshot-height) !important;
+  min-height: var(--snapshot-height) !important;
+  max-height: var(--snapshot-height) !important;
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+.capturing-analysis
+  .analysis-export-content[data-snapshot-ratio]
+  :is(.analysis-scroll-content, .pool-grid, .detail-view, .table-view) {
+  min-height: 0 !important;
+  max-height: none !important;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio] .reference-pool {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.capturing-analysis
+  .analysis-export-content[data-snapshot-ratio]
+  :is(.pool-grid, .reference-pool > ul) {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio] .pool-grid {
+  align-items: start !important;
+  grid-auto-rows: max-content !important;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio] .reference-pool > ul {
+  display: grid !important;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio] .analysis-scroll-content {
+  height: auto !important;
+  overflow: visible !important;
+}
+.capturing-analysis
+  .analysis-export-content[data-snapshot-ratio]
+  :is(
+    .detail-view,
+    .detail-view > article,
+    .detail-view aside,
+    .table-view,
+    .gacha-table-wrap,
+    .gacha-table-scroll,
+    .version-summary-list
+  ) {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio='desktop'] .pool-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio='phone'] {
+  gap: 10px;
+  padding: 12px;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio='phone'] .luck-summary {
+  grid-template-columns: 1fr !important;
+  align-items: start;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio='phone'] .luck-tags,
+.capturing-analysis .analysis-export-content[data-snapshot-ratio='phone'] .luck-metrics {
+  grid-column: 1 !important;
+  grid-row: auto !important;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio='phone'] .luck-metrics {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+.capturing-analysis .analysis-export-content[data-snapshot-ratio='phone'] .pool-grid {
+  grid-template-columns: 1fr !important;
+}
+.capturing-analysis
+  .analysis-export-content[data-snapshot-ratio='phone']
+  :is(.detail-view, .table-view) {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto auto !important;
+}
+.capturing-analysis
+  .analysis-export-content[data-snapshot-ratio='phone']
+  :is(.detail-view aside, .table-pool-filter) {
+  display: flex !important;
+  overflow: hidden !important;
+}
+.capturing-analysis
+  .analysis-export-content[data-snapshot-ratio='phone']
+  :is(.detail-view aside button, .table-pool-filter button) {
+  min-width: 128px;
+}
+.capturing-analysis
+  .analysis-export-content[data-snapshot-ratio='phone']
+  .version-summary-list
+  > article
+  > header {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+.capturing-analysis
+  .analysis-export-content[data-snapshot-ratio='phone']
+  .version-summary-list
+  > article
+  > header
+  > div:first-child {
+  grid-column: 1/-1;
+}
+
+/* Version cards: one title row followed by one compact four-metric row. */
+.shell .version-summary-list > article > header {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding: 13px 16px !important;
+}
+.shell .version-summary-list > article > header > div:first-child {
+  grid-column: 1/-1;
+  min-width: 0;
+}
+.shell .version-summary-list > article > header > div:not(:first-child) {
+  min-width: 0;
+  padding: 2px 4px;
+  text-align: center;
+}
+.shell .version-summary-list > article > header > div:not(:first-child) b {
+  display: block;
+  overflow: hidden;
+  font-size: clamp(16px, 1.6vw, 21px) !important;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell .version-summary-list > article > header > div:not(:first-child) span {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Configurable selection marker shared by resource briefing mode controls. */
+.shell {
+  --selection-highlight-color: #22aeb0;
+  --selection-highlight-top: 0px;
+  --selection-highlight-right: 0px;
+  --selection-highlight-bottom: 4px;
+  --selection-highlight-left: 4px;
+}
+.shell .briefing-shell :is(.briefing-tabs button, .view-switch button) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--t-line) !important;
+  color: var(--t-text) !important;
+  background: var(--t-control) !important;
+  box-shadow: none !important;
+}
+.shell .briefing-shell select {
+  min-height: 38px;
+  padding: 0 34px 0 12px !important;
+  border: 1px solid var(--t-line) !important;
+  color: var(--t-text) !important;
+  background-color: var(--t-control) !important;
+  background-image: none !important;
+  line-height: 38px;
+  text-align: left;
+  text-align-last: left;
+}
+.shell .briefing-shell .briefing-section-heading select {
+  border-color: color-mix(in srgb, var(--t-accent) 52%, var(--t-line)) !important;
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--t-accent) 18%, var(--t-control)) !important;
+}
+.shell .briefing-shell select option {
+  min-height: 36px;
+  padding: 8px 12px;
+  color: var(--t-text) !important;
+  background: var(--t-raised) !important;
+  text-align: left;
+}
+.shell.theme-light .briefing-shell select option {
+  color: #1c292e !important;
+  background: #fbfdfd !important;
+}
+.shell:not(.theme-light) .briefing-shell select option {
+  color: #e7eef0 !important;
+  background: #102129 !important;
+}
+.shell .briefing-shell .themed-select {
+  position: relative;
+  z-index: 10;
+  min-width: 170px;
+  color: var(--t-text);
+}
+.shell .briefing-shell .themed-select[open] {
+  z-index: 30;
+}
+.shell .briefing-shell .themed-select.disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+.shell .briefing-shell .themed-select summary {
+  display: flex;
+  min-height: 38px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--t-accent) 52%, var(--t-line));
+  border-radius: 10px;
+  color: var(--t-strong);
+  background: color-mix(in srgb, var(--t-accent) 18%, var(--t-control));
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.shell .briefing-shell .themed-select summary::-webkit-details-marker {
+  display: none;
+}
+.shell .briefing-shell .themed-select summary > i {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.16s ease;
+}
+.shell .briefing-shell .themed-select[open] summary > i {
+  transform: translateY(2px) rotate(225deg);
+}
+.shell .briefing-shell .select-menu {
+  position: absolute;
+  inset: calc(100% + 5px) 0 auto;
+  display: grid;
+  max-height: 260px;
+  overflow: auto;
+  padding: 5px;
+  border: 1px solid var(--t-line);
+  border-radius: 10px;
+  color: var(--t-text);
+  background: var(--t-raised);
+  box-shadow: 0 12px 28px var(--t-shadow);
+  backdrop-filter: blur(20px);
+}
+.shell .briefing-shell .select-menu > button {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  color: var(--t-text) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: left;
+  white-space: nowrap;
+}
+.shell .briefing-shell .select-menu > button:hover {
+  background: var(--t-hover) !important;
+}
+.shell .briefing-shell .select-menu > button.selected {
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--selection-highlight-color) 24%, var(--t-raised)) !important;
+  box-shadow: inset var(--selection-highlight-left) 0 0 var(--selection-highlight-color) !important;
+  font-weight: 800;
+}
+.shell .briefing-shell .sort-select {
+  min-width: 126px;
+}
+.shell .briefing-shell .sort-select summary {
+  min-height: 32px;
+  border-color: var(--t-line);
+  background: var(--t-control);
+  font-weight: 500;
+}
+.highlight-settings {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 17px;
+  border-top: 1px solid var(--t-divider);
+}
+.highlight-settings-heading,
+.highlight-color-row {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+}
+.highlight-settings-heading > i {
+  width: 48px;
+  height: 30px;
+  border-style: solid;
+  border-radius: 7px;
+  background: var(--t-control);
+}
+.highlight-sides {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.highlight-sides > label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px !important;
+  min-height: 34px;
+  border: 1px solid var(--t-divider);
+  border-radius: 8px;
+  background: var(--t-control);
+}
+.highlight-color-row input[type='color'] {
+  width: 52px;
+  height: 32px;
+  padding: 3px;
+}
+@media (max-width: 680px) {
+  .shell .version-summary-list > article > header {
+    gap: 3px !important;
+    padding: 11px 9px !important;
+  }
+  .shell .version-summary-list > article > header > div:not(:first-child) {
+    padding-inline: 1px;
+  }
+  .shell .version-summary-list > article > header > div:not(:first-child) b {
+    font-size: 15px !important;
+  }
+  .shell .version-summary-list > article > header > div:not(:first-child) span {
+    font-size: 9px !important;
+  }
+}
+
+.shell .gacha-content.gacha-high-contrast .gacha-option-toggle input[type='checkbox']:checked {
+  border-color: var(--t-accent) !important;
+  background: var(--t-accent) !important;
+}
+
+/* Cross-theme badges and mode selection use one high-contrast visual language. */
+.shell .home-installation-list .game-title > span {
+  border: 1px solid color-mix(in srgb, var(--t-accent) 62%, transparent) !important;
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--t-accent) 22%, var(--t-raised)) !important;
+  font-weight: 700;
+}
+.shell.theme-light .home-installation-list .game-title > span {
+  border-color: rgba(25, 125, 128, 0.4) !important;
+  color: #075b5d !important;
+  background: #dff1f0 !important;
+}
+.shell .system-health {
+  border: 1px solid color-mix(in srgb, #24a58f 68%, transparent) !important;
+  color: #dffff9 !important;
+  background: #176a61 !important;
+  font-weight: 700;
+}
+.shell.theme-light .system-health {
+  border-color: #16816f !important;
+  color: #064b42 !important;
+  background: #c9eee6 !important;
+}
+.shell .system-health.error {
+  border-color: #d65757 !important;
+  color: #fff4f3 !important;
+  background: #8f3333 !important;
+}
+.shell.theme-light .system-health.error {
+  color: #742323 !important;
+  background: #ffe0de !important;
+}
+.shell :is(.theme-choices, .wallpaper-mode-tabs) > button {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--t-text) 22%, transparent) !important;
+  border-left-width: 4px !important;
+  border-left-color: transparent !important;
+  color: var(--t-text) !important;
+  background: color-mix(in srgb, var(--t-raised) 78%, transparent) !important;
+  box-shadow: none !important;
+}
+.shell :is(.theme-choices, .wallpaper-mode-tabs) > button.active {
+  border-color: color-mix(in srgb, #197d80 48%, var(--t-divider)) !important;
+  border-left: 4px solid #22aeb0 !important;
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, #197d80 26%, var(--t-raised)) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 8%, transparent) !important;
+}
+.shell.theme-light :is(.theme-choices, .wallpaper-mode-tabs) > button.active {
+  border-color: rgba(25, 125, 128, 0.38) !important;
+  border-left-color: #197d80 !important;
+  color: #092e30 !important;
+  background: #dceeed !important;
+}
+.shell :is(.theme-choices, .wallpaper-mode-tabs) > button.active * {
+  color: inherit !important;
+}
+
+/* Frameless title bar follows the active application theme. */
+.shell {
+  padding-top: 38px;
+}
+.window-titlebar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1000;
+  display: flex;
+  height: 38px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--t-divider);
+  color: var(--t-text);
+  background: color-mix(in srgb, var(--t-panel) 92%, transparent);
+  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(20px) saturate(1.15);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+.window-titlebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 13px;
+}
+.window-titlebar-brand > span {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--t-accent) 70%, transparent);
+  border-radius: 6px;
+  color: var(--t-strong);
+  background: color-mix(in srgb, var(--t-accent) 24%, transparent);
+  font-size: 11px;
+  font-weight: 800;
+}
+.window-titlebar-brand strong {
+  font-size: 12px;
+}
+.window-titlebar-brand small {
+  padding-left: 2px;
+  opacity: 0.5;
+  font-size: 10px;
+}
+.window-controls {
+  display: flex;
+  align-self: stretch;
+  -webkit-app-region: no-drag;
+}
+.window-controls button {
+  width: 46px;
+  min-height: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: var(--t-text) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 15px;
+}
+.window-controls button:hover {
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--t-text) 12%, transparent) !important;
+}
+.window-controls .window-close:hover {
+  color: white !important;
+  background: #c42b32 !important;
+}
+.shell.theme-light .window-titlebar {
+  background: rgba(247, 250, 251, 0.9);
+}
+
+/* Settings appearance editor: one visual workspace instead of two unrelated cards. */
+.appearance-settings-card {
+  padding: 22px !important;
+}
+.appearance-heading {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--t-divider);
+}
+.appearance-heading > small {
+  color: var(--t-muted);
+}
+.appearance-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(420px, 1.6fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+.appearance-layout > section {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--t-divider);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--t-raised) 70%, transparent);
+}
+.appearance-layout h3 {
+  margin: 0 0 14px;
+  color: var(--t-strong);
+  font-size: 15px;
+}
+.appearance-theme-section {
+  align-self: start;
+}
+.appearance-theme-section > label {
+  display: grid;
+  gap: 10px;
+  color: var(--t-text);
+  font-size: 12px;
+}
+.appearance-wallpaper-section .wallpaper-preview {
+  height: 190px;
+}
+.behavior-settings-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 0 22px;
+}
+.behavior-settings-card > h2 {
+  grid-column: 1 / -1;
+}
+
+/* Home redemption summary includes every region, only when valid and unused. */
+.quick-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.quick-card-heading b {
+  display: grid;
+  min-width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--t-strong);
+  background: color-mix(in srgb, var(--t-accent) 24%, transparent);
+  font-size: 12px;
+}
+.home-code-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.home-code-list > span {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--t-accent) 30%, var(--t-divider));
+  border-radius: 8px;
+  color: var(--t-strong);
+  background: color-mix(in srgb, var(--t-accent) 10%, var(--t-raised));
+}
+.home-code-list i {
+  color: var(--t-accent);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+.home-code-list code {
+  color: inherit;
+  font-size: 11px;
+}
+@media (max-width: 1000px) {
+  .appearance-layout {
+    grid-template-columns: 1fr;
+  }
+  .behavior-settings-card {
+    grid-template-columns: 1fr;
+  }
+  .window-titlebar-brand small {
+    display: none;
+  }
+}
+
+/* The title bar owns the top strip; only page content may scroll below it. */
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.shell {
+  width: 100%;
+  height: 100vh;
+  min-height: 0 !important;
+  overflow: hidden;
+}
+.shell > .sidebar,
+.shell > .content {
+  height: calc(100vh - 38px);
+  min-height: 0;
+}
+.shell > .sidebar {
+  top: 38px;
+}
+.shell > .content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* Appearance groups intentionally stack as two full-width rows. */
+.appearance-layout {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+.appearance-layout > section {
+  width: 100%;
+}
+.wallpaper-preview {
+  position: relative;
+  isolation: isolate;
+  transform: none !important;
+}
+.wallpaper-preview-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-repeat: no-repeat;
+  transform-origin: center;
+}
+.wallpaper-preview > span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Home quick actions are equal halves and align exactly with the installation rail. */
+.home-content .home-quick-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  width: min(400px, 100%);
+  gap: 8px;
+}
+.home-content .home-quick-grid > .quick-card {
+  width: 100%;
+  min-width: 0;
+  padding: 15px;
+}
+
+/* Redemption state badges remain legible in glass, dark and light themes. */
+.shell .code-list article.expired {
+  opacity: 0.78 !important;
+}
+.shell .code-list article > div:first-child > span {
+  border: 1px solid #238d72 !important;
+  color: #eafff8 !important;
+  background: #17614f !important;
+  font-weight: 700;
+}
+.shell .code-list article.used > div:first-child > span {
+  border-color: #4d78a8 !important;
+  color: #f1f7ff !important;
+  background: #345c88 !important;
+}
+.shell .code-list article.expired:not(.used) > div:first-child > span {
+  border-color: #8c6262 !important;
+  color: #fff5f3 !important;
+  background: #754747 !important;
+}
+.shell.theme-light .code-list article > div:first-child > span {
+  border-color: #17765f !important;
+  color: #064536 !important;
+  background: #ccece1 !important;
+}
+.shell.theme-light .code-list article.used > div:first-child > span {
+  border-color: #5279a5 !important;
+  color: #193d66 !important;
+  background: #dce9f8 !important;
+}
+.shell.theme-light .code-list article.expired:not(.used) > div:first-child > span {
+  border-color: #a36a67 !important;
+  color: #712d29 !important;
+  background: #f6dedb !important;
+}
+
+/* Remove legacy selected decoration before the unified marker is applied. */
+.shell:is(.theme-glass, .theme-dark, .theme-light)
+  :is(.theme-choices, .wallpaper-mode-tabs)
+  > button {
+  box-sizing: border-box;
+  border-width: 1px !important;
+  border-color: var(--t-line) !important;
+}
+.shell:is(.theme-glass, .theme-dark, .theme-light) .nav-item {
+  box-sizing: border-box;
+  border: 0 !important;
+}
+.shell:is(.theme-glass, .theme-dark, .theme-light)
+  :is(
+    .nav-item.active,
+    .analysis-tabs button.active,
+    .tab-bar button.active,
+    .quick-settings-tabs button.active,
+    .quick-profile-tabs button.active,
+    .briefing-tabs button.active,
+    .view-switch button.active,
+    .kuro-tabs button.active,
+    .calc-tabs button.active,
+    .challenge-tabs button.active,
+    .theme-choices button.active,
+    .wallpaper-mode-tabs button.active,
+    .home-account-strip button.active,
+    .account-methods button.active,
+    .account-customization-list button.active,
+    .account-card.active,
+    .player-switcher button.active,
+    .detail-view aside button.active,
+    .table-pool-filter button.active,
+    .version-metadata-tools button.active,
+    .gacha-table-header button.active,
+    .gacha-uid-options button.active,
+    .filter-group button.active,
+    .filter-select-menu button.active,
+    .item-card.selected,
+    .selected-strip button.active,
+    .result-strip button.active,
+    .role-switcher button.active,
+    .kuro-account-chip.active,
+    .login-methods button.active,
+    .themed-select-popover > button.active,
+    .select-menu > button.selected
+  ) {
+  border-width: 1px !important;
+  border-color: var(--t-line) !important;
+  color: var(--t-strong) !important;
+  background: var(--t-control) !important;
+  box-shadow: none !important;
+}
+.shell:is(.theme-glass, .theme-dark, .theme-light) .nav-item.active {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* Unified configurable marker for selected navigation, tabs and options. */
+.shell.highlight-default-navigation .nav-item.active,
+.shell.highlight-default-tabs
+  :where(
+    .analysis-tabs button.active,
+    .tab-bar button.active,
+    .quick-settings-tabs button.active,
+    .quick-profile-tabs button.active,
+    .briefing-tabs button.active,
+    .view-switch button.active,
+    .kuro-tabs button.active,
+    .calc-tabs button.active,
+    .challenge-tabs button.active
+  ),
+.shell.highlight-default-options
+  :where(
+    .theme-choices button.active,
+    .wallpaper-mode-tabs button.active,
+    .home-account-strip button.active,
+    .account-methods button.active,
+    .account-customization-list button.active,
+    .account-card.active,
+    .player-switcher button.active,
+    .detail-view aside button.active,
+    .table-pool-filter button.active,
+    .version-metadata-tools button.active,
+    .gacha-table-header button.active,
+    .gacha-uid-options button.active,
+    .filter-group button.active,
+    .filter-select-menu button.active,
+    .item-card.selected,
+    .selected-strip button.active,
+    .result-strip button.active,
+    .role-switcher button.active,
+    .kuro-account-chip.active,
+    .login-methods button.active,
+    .themed-select-popover > button.active,
+    .select-menu > button.selected
+  ) {
+  --selection-highlight-color: #22aeb0;
+  --selection-highlight-top: 0px;
+  --selection-highlight-right: 0px;
+  --selection-highlight-bottom: 4px;
+  --selection-highlight-left: 4px;
+}
+.shell.highlight-scope-navigation .nav-item.active,
+.shell.highlight-scope-tabs
+  :where(
+    .analysis-tabs button.active,
+    .tab-bar button.active,
+    .quick-settings-tabs button.active,
+    .quick-profile-tabs button.active,
+    .briefing-tabs button.active,
+    .view-switch button.active,
+    .kuro-tabs button.active,
+    .calc-tabs button.active,
+    .challenge-tabs button.active
+  ),
+.shell.highlight-scope-options
+  :where(
+    .theme-choices button.active,
+    .wallpaper-mode-tabs button.active,
+    .home-account-strip button.active,
+    .account-methods button.active,
+    .account-customization-list button.active,
+    .account-card.active,
+    .player-switcher button.active,
+    .detail-view aside button.active,
+    .table-pool-filter button.active,
+    .version-metadata-tools button.active,
+    .gacha-table-header button.active,
+    .gacha-uid-options button.active,
+    .filter-group button.active,
+    .filter-select-menu button.active,
+    .item-card.selected,
+    .selected-strip button.active,
+    .result-strip button.active,
+    .role-switcher button.active,
+    .kuro-account-chip.active,
+    .login-methods button.active,
+    .themed-select-popover > button.active,
+    .select-menu > button.selected
+  ) {
+  position: relative;
+  isolation: isolate;
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--selection-highlight-color) 24%, var(--t-raised)) !important;
+  box-shadow: none !important;
+}
+.shell.highlight-scope-navigation .nav-item.active::after,
+.shell.highlight-scope-tabs
+  :where(
+    .analysis-tabs button.active,
+    .tab-bar button.active,
+    .quick-settings-tabs button.active,
+    .quick-profile-tabs button.active,
+    .briefing-tabs button.active,
+    .view-switch button.active,
+    .kuro-tabs button.active,
+    .calc-tabs button.active,
+    .challenge-tabs button.active
+  )::after,
+.shell.highlight-scope-options
+  :where(
+    .theme-choices button.active,
+    .wallpaper-mode-tabs button.active,
+    .home-account-strip button.active,
+    .account-methods button.active,
+    .account-customization-list button.active,
+    .account-card.active,
+    .player-switcher button.active,
+    .detail-view aside button.active,
+    .table-pool-filter button.active,
+    .version-metadata-tools button.active,
+    .gacha-table-header button.active,
+    .gacha-uid-options button.active,
+    .filter-group button.active,
+    .filter-select-menu button.active,
+    .item-card.selected,
+    .selected-strip button.active,
+    .result-strip button.active,
+    .role-switcher button.active,
+    .kuro-account-chip.active,
+    .login-methods button.active,
+    .themed-select-popover > button.active,
+    .select-menu > button.selected
+  )::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: inherit;
+  background: transparent !important;
+  box-shadow:
+    inset var(--selection-highlight-left) 0 0 0 var(--selection-highlight-color),
+    inset calc(-1 * var(--selection-highlight-right)) 0 0 0 var(--selection-highlight-color),
+    inset 0 var(--selection-highlight-top) 0 0 var(--selection-highlight-color),
+    inset 0 calc(-1 * var(--selection-highlight-bottom)) 0 0 var(--selection-highlight-color) !important;
+  content: '';
+  pointer-events: none;
+}
+.shell.highlight-scope-options input[type='checkbox']:checked,
+.shell.highlight-scope-options input[type='radio']:checked {
+  accent-color: var(--selection-highlight-color);
+}
+.shell.highlight-default-options input[type='checkbox']:checked,
+.shell.highlight-default-options input[type='radio']:checked {
+  accent-color: #22aeb0;
+}
+
+/* Hover uses a separate, softer marker while preserving default fallback per scope. */
+.shell {
+  --selection-hover-color: #5bd1cf;
+}
+.shell.hover-default-navigation .nav-item:hover:not(:disabled),
+.shell.hover-default-tabs
+  :where(
+    .analysis-tabs button,
+    .tab-bar button,
+    .quick-settings-tabs button,
+    .quick-profile-tabs button,
+    .briefing-tabs button,
+    .view-switch button,
+    .kuro-tabs button,
+    .calc-tabs button,
+    .challenge-tabs button
+  ):hover:not(:disabled),
+.shell.hover-default-options
+  :where(
+    .theme-choices button,
+    .wallpaper-mode-tabs button,
+    .home-account-strip button,
+    .account-methods button,
+    .account-customization-list button,
+    .account-card,
+    .player-switcher button,
+    .detail-view aside button,
+    .table-pool-filter button,
+    .version-metadata-tools button,
+    .gacha-table-header button,
+    .gacha-uid-options button,
+    .filter-group button,
+    .filter-select-menu button,
+    .item-card,
+    .selected-strip button,
+    .result-strip button,
+    .role-switcher button,
+    .kuro-account-chip,
+    .login-methods button,
+    .themed-select-popover > button,
+    .select-menu > button
+  ):hover:not(:disabled) {
+  --selection-hover-color: #22aeb0;
+}
+.shell.hover-scope-navigation .nav-item:hover:not(:disabled),
+.shell.hover-scope-tabs
+  :where(
+    .analysis-tabs button,
+    .tab-bar button,
+    .quick-settings-tabs button,
+    .quick-profile-tabs button,
+    .briefing-tabs button,
+    .view-switch button,
+    .kuro-tabs button,
+    .calc-tabs button,
+    .challenge-tabs button
+  ):hover:not(:disabled),
+.shell.hover-scope-options
+  :where(
+    .theme-choices button,
+    .wallpaper-mode-tabs button,
+    .home-account-strip button,
+    .account-methods button,
+    .account-customization-list button,
+    .account-card,
+    .player-switcher button,
+    .detail-view aside button,
+    .table-pool-filter button,
+    .version-metadata-tools button,
+    .gacha-table-header button,
+    .gacha-uid-options button,
+    .filter-group button,
+    .filter-select-menu button,
+    .item-card,
+    .selected-strip button,
+    .result-strip button,
+    .role-switcher button,
+    .kuro-account-chip,
+    .login-methods button,
+    .themed-select-popover > button,
+    .select-menu > button
+  ):hover:not(:disabled) {
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--selection-hover-color) 14%, var(--t-raised)) !important;
+  box-shadow: inset 0 0 0 1px var(--selection-hover-color) !important;
+}
+
+/* High-contrast gacha keeps its own marker unless its dedicated scope is enabled. */
+.shell:not(.highlight-scope-gacha-contrast)
+  .gacha-content.gacha-high-contrast
+  :where(
+    .analysis-tabs button.active,
+    .table-pool-filter button.active,
+    .detail-view aside button.active
+  ) {
+  border-color: #ffc13d !important;
+  color: #fff8e9 !important;
+  background: linear-gradient(135deg, #6b3d1d, #3c2214) !important;
+  box-shadow: inset 3px 0 0 #ffc13d !important;
+}
+.shell:not(.highlight-scope-gacha-contrast)
+  .gacha-content.gacha-high-contrast
+  :where(
+    .analysis-tabs button.active,
+    .table-pool-filter button.active,
+    .detail-view aside button.active
+  )::after {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.shell.highlight-scope-gacha-contrast
+  .gacha-content.gacha-high-contrast
+  :where(
+    .analysis-tabs button.active,
+    .table-pool-filter button.active,
+    .detail-view aside button.active
+  ) {
+  --selection-highlight-color: inherit;
+  --selection-highlight-top: inherit;
+  --selection-highlight-right: inherit;
+  --selection-highlight-bottom: inherit;
+  --selection-highlight-left: inherit;
+  position: relative;
+  border-color: var(--selection-highlight-color) !important;
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--selection-highlight-color) 28%, var(--t-raised)) !important;
+  box-shadow: none !important;
+}
+.shell.highlight-scope-gacha-contrast
+  .gacha-content.gacha-high-contrast
+  :where(
+    .analysis-tabs button.active,
+    .table-pool-filter button.active,
+    .detail-view aside button.active
+  )::after {
+  border: 0 !important;
+  box-shadow:
+    inset var(--selection-highlight-left) 0 0 0 var(--selection-highlight-color),
+    inset calc(-1 * var(--selection-highlight-right)) 0 0 0 var(--selection-highlight-color),
+    inset 0 var(--selection-highlight-top) 0 0 var(--selection-highlight-color),
+    inset 0 calc(-1 * var(--selection-highlight-bottom)) 0 0 var(--selection-highlight-color) !important;
+}
+.shell.highlight-scope-gacha-contrast
+  .gacha-content.gacha-high-contrast
+  .gacha-option-toggle
+  input[type='checkbox']:checked {
+  border-color: var(--selection-highlight-color) !important;
+  background: var(--selection-highlight-color) !important;
+}
+
+.highlight-scope-settings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+.highlight-scope-settings > span {
+  grid-column: 1 / -1;
+  color: var(--t-muted);
+  font-size: 11px;
+}
+.highlight-scope-settings > label {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 2px 7px !important;
+  min-height: 48px;
+  padding: 7px 8px;
+  border: 1px solid var(--t-divider);
+  border-radius: 8px;
+  background: var(--t-control);
+}
+.highlight-scope-settings input {
+  grid-row: 1 / 3;
+  margin: 0;
+}
+.highlight-scope-settings b,
+.highlight-scope-settings small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.highlight-scope-settings b {
+  color: var(--t-strong);
+  font-size: 11px;
+}
+.highlight-scope-settings small {
+  color: var(--t-muted);
+  font-size: 9px;
+}
+.shell.highlight-scope-navigation .nav-item:hover:not(:disabled),
+.shell.highlight-scope-tabs
+  :where(
+    .analysis-tabs button,
+    .tab-bar button,
+    .quick-settings-tabs button,
+    .quick-profile-tabs button,
+    .briefing-tabs button,
+    .view-switch button,
+    .kuro-tabs button,
+    .calc-tabs button,
+    .challenge-tabs button
+  ):hover:not(:disabled),
+.shell.highlight-scope-options
+  :where(
+    .theme-choices button,
+    .wallpaper-mode-tabs button,
+    .home-account-strip button,
+    .account-methods button,
+    .account-customization-list button,
+    .account-card,
+    .player-switcher button,
+    .detail-view aside button,
+    .table-pool-filter button,
+    .version-metadata-tools button,
+    .gacha-table-header button,
+    .gacha-uid-options button,
+    .filter-group button,
+    .filter-select-menu button,
+    .item-card,
+    .selected-strip button,
+    .result-strip button,
+    .role-switcher button,
+    .kuro-account-chip,
+    .login-methods button,
+    .themed-select-popover > button,
+    .select-menu > button
+  ):hover:not(:disabled) {
+  color: var(--t-strong) !important;
+  background: color-mix(in srgb, var(--selection-hover-color) 14%, var(--t-raised)) !important;
+  box-shadow: inset 0 0 0 1px var(--selection-hover-color) !important;
+}
+.shell.hover-style-underline
+  :where(
+    .nav-item,
+    .analysis-tabs button,
+    .tab-bar button,
+    .quick-settings-tabs button,
+    .quick-profile-tabs button,
+    .briefing-tabs button,
+    .view-switch button,
+    .kuro-tabs button,
+    .calc-tabs button,
+    .challenge-tabs button,
+    .theme-choices button,
+    .wallpaper-mode-tabs button,
+    .account-card
+  ):hover:not(:disabled) {
+  box-shadow: inset 0 -3px 0 var(--selection-hover-color) !important;
+}
+.shell.hover-style-glow
+  :where(
+    .nav-item,
+    .analysis-tabs button,
+    .tab-bar button,
+    .quick-settings-tabs button,
+    .quick-profile-tabs button,
+    .briefing-tabs button,
+    .view-switch button,
+    .kuro-tabs button,
+    .calc-tabs button,
+    .challenge-tabs button,
+    .theme-choices button,
+    .wallpaper-mode-tabs button,
+    .account-card
+  ):hover:not(:disabled) {
+  box-shadow: 0 0 14px color-mix(in srgb, var(--selection-hover-color) 55%, transparent) !important;
+}
+.shell.hover-style-fill
+  :where(
+    .nav-item,
+    .analysis-tabs button,
+    .tab-bar button,
+    .quick-settings-tabs button,
+    .quick-profile-tabs button,
+    .briefing-tabs button,
+    .view-switch button,
+    .kuro-tabs button,
+    .calc-tabs button,
+    .challenge-tabs button,
+    .theme-choices button,
+    .wallpaper-mode-tabs button,
+    .account-card
+  ):hover:not(:disabled) {
+  background: color-mix(in srgb, var(--selection-hover-color) 28%, var(--t-raised)) !important;
+}
+
+/* Hover styling follows the same scope switches as the selected marker. */
+.shell {
+  --selection-hover-background: color-mix(
+    in srgb,
+    var(--selection-hover-color) 14%,
+    var(--t-raised)
+  );
+  --selection-hover-shadow: inset 0 0 0 1px var(--selection-hover-color);
+  --selection-hover-transform: none;
+}
+.shell.hover-style-underline {
+  --selection-hover-shadow: inset 0 -3px 0 var(--selection-hover-color);
+}
+.shell.hover-style-glow {
+  --selection-hover-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--selection-hover-color) 72%, transparent),
+    0 0 14px color-mix(in srgb, var(--selection-hover-color) 48%, transparent);
+}
+.shell.hover-style-fill {
+  --selection-hover-background: color-mix(
+    in srgb,
+    var(--selection-hover-color) 30%,
+    var(--t-raised)
+  );
+  --selection-hover-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--selection-hover-color) 58%, transparent);
+}
+.shell.hover-style-double {
+  --selection-hover-shadow:
+    inset 0 0 0 1px var(--selection-hover-color),
+    inset 0 0 0 4px color-mix(in srgb, var(--selection-hover-color) 24%, transparent);
+}
+.shell.hover-style-lift {
+  --selection-hover-background: color-mix(
+    in srgb,
+    var(--selection-hover-color) 20%,
+    var(--t-raised)
+  );
+  --selection-hover-shadow:
+    inset 0 0 0 1px var(--selection-hover-color),
+    0 5px 12px color-mix(in srgb, var(--selection-hover-color) 24%, transparent);
+  --selection-hover-transform: translateY(-1px);
+}
+.shell.highlight-scope-navigation .nav-item:hover:not(:disabled),
+.shell.highlight-scope-tabs
+  :where(
+    .analysis-tabs button,
+    .tab-bar button,
+    .quick-settings-tabs button,
+    .quick-profile-tabs button,
+    .briefing-tabs button,
+    .view-switch button,
+    .kuro-tabs button,
+    .calc-tabs button,
+    .challenge-tabs button
+  ):hover:not(:disabled),
+.shell.highlight-scope-options
+  :where(
+    .theme-choices button,
+    .wallpaper-mode-tabs button,
+    .home-account-strip button,
+    .account-methods button,
+    .account-customization-list button,
+    .account-card,
+    .player-switcher button,
+    .detail-view aside button,
+    .table-pool-filter button,
+    .version-metadata-tools button,
+    .gacha-table-header button,
+    .gacha-uid-options button,
+    .filter-group button,
+    .filter-select-menu button,
+    .item-card,
+    .selected-strip button,
+    .result-strip button,
+    .role-switcher button,
+    .kuro-account-chip,
+    .login-methods button,
+    .themed-select-popover > button,
+    .select-menu > button
+  ):hover:not(:disabled) {
+  color: var(--t-strong) !important;
+  background: var(--selection-hover-background) !important;
+  box-shadow: var(--selection-hover-shadow) !important;
+  transform: var(--selection-hover-transform);
+}

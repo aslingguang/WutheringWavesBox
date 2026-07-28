@@ -1,0 +1,73 @@
+{
+  "name": "@wwbox/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "鸣潮桌面工具箱",
+  "author": "WutheringWavesBox Contributors",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/aslingguang/WutheringWavesBox#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aslingguang/WutheringWavesBox.git"
+  },
+  "type": "module",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
+    "test": "vitest run",
+    "release:win": "npm run build && electron-builder --win nsis --x64",
+    "release:portable": "npm run build && electron-builder --win portable --x64 --config.win.artifactName=WutheringWavesBox-${version}-win-${arch}-portable.${ext}"
+  },
+  "dependencies": {
+    "@wwbox/contracts": "0.1.0",
+    "html-to-image": "^1.11.13",
+    "vue": "^3.5.39"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.0.12",
+    "electron-vite": "^5.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6",
+    "vitest": "^4.1.10",
+    "vue-tsc": "^3.2.6"
+  },
+  "build": {
+    "appId": "com.wwbox.desktop",
+    "productName": "鸣潮工具箱",
+    "directories": {
+      "output": "../../release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "release-helper",
+        "to": "helper"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "WutheringWavesBox-${version}-win-${arch}-setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

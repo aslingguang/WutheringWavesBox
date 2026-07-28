@@ -1,0 +1,966 @@
+/* Isolated top-layer styling for gacha controls.
+   These rules intentionally do not depend on .shell ancestry: popovers render in
+   the browser top layer and own their complete palette through data-theme. */
+
+:is(
+  .snapshot-settings-popover,
+  .gacha-uid-options,
+  .url-history-popover,
+  .url-history-empty,
+  .table-page-settings-popover
+)[data-theme] {
+  --overlay-bg: #122f38;
+  --overlay-raised: #1b3d47;
+  --overlay-hover: #285964;
+  --overlay-control: #0b222a;
+  --overlay-text: #f0f8f9;
+  --overlay-muted: #afc3c8;
+  --overlay-line: #668790;
+  --overlay-accent: #73ded6;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  padding: 10px !important;
+  border: 1px solid var(--overlay-line) !important;
+  border-radius: 13px !important;
+  color: var(--overlay-text) !important;
+  background: var(--overlay-bg) !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  color-scheme: dark;
+  backdrop-filter: none !important;
+  box-shadow: 0 24px 68px rgba(0, 0, 0, 0.72) !important;
+}
+
+:is(
+  .snapshot-settings-popover,
+  .gacha-uid-options,
+  .url-history-popover,
+  .url-history-empty,
+  .table-page-settings-popover
+)[data-theme='dark'] {
+  --overlay-bg: #07191f;
+  --overlay-raised: #102c34;
+  --overlay-hover: #1b4650;
+  --overlay-control: #06151a;
+  --overlay-text: #f1f8f9;
+  --overlay-muted: #a6bac0;
+  --overlay-line: #486872;
+  --overlay-accent: #68d0ca;
+  box-shadow: 0 24px 68px rgba(0, 0, 0, 0.82) !important;
+}
+
+:is(
+  .snapshot-settings-popover,
+  .gacha-uid-options,
+  .url-history-popover,
+  .url-history-empty,
+  .table-page-settings-popover
+)[data-theme='light'] {
+  --overlay-bg: #fbfdfd;
+  --overlay-raised: #edf3f4;
+  --overlay-hover: #d7e9ea;
+  --overlay-control: #ffffff;
+  --overlay-text: #14262b;
+  --overlay-muted: #50666d;
+  --overlay-line: #94aab0;
+  --overlay-accent: #167b7e;
+  color-scheme: light;
+  box-shadow: 0 22px 58px rgba(34, 53, 59, 0.3) !important;
+}
+
+:is(
+    .snapshot-settings-popover,
+    .gacha-uid-options,
+    .url-history-popover,
+    .url-history-empty,
+    .table-page-settings-popover
+  )[data-theme]:not(:popover-open) {
+  display: none !important;
+}
+
+:is(
+    .snapshot-settings-popover,
+    .gacha-uid-options,
+    .url-history-popover,
+    .url-history-empty,
+    .table-page-settings-popover
+  )[data-theme]:popover-open {
+  display: block;
+}
+
+:is(.snapshot-settings-popover, .table-page-settings-popover)[data-theme] label {
+  display: grid;
+  gap: 7px;
+  color: var(--overlay-text) !important;
+}
+
+:is(.snapshot-settings-popover, .table-page-settings-popover)[data-theme] :is(input, select) {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid var(--overlay-line) !important;
+  border-radius: 9px !important;
+  color: var(--overlay-text) !important;
+  background: var(--overlay-control) !important;
+  outline: none;
+}
+
+.snapshot-settings-popover[data-theme] label:first-of-type input[type='number'] {
+  width: 88px;
+  justify-self: start;
+}
+
+.snapshot-settings-dialog {
+  width: max-content;
+  min-width: min(400px, calc(100vw - 32px));
+  padding: 0;
+}
+
+.snapshot-settings-dialog > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 16px;
+}
+
+.snapshot-settings-fields {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.snapshot-settings-fields label {
+  display: grid;
+  gap: 7px;
+  color: var(--dialog-text);
+}
+
+.snapshot-settings-fields input {
+  box-sizing: border-box;
+  width: 88px;
+  min-height: 38px;
+  justify-self: start;
+  padding: 7px 10px;
+  border: 1px solid var(--dialog-line) !important;
+  border-radius: 9px !important;
+  color: var(--dialog-text) !important;
+  background: var(--dialog-control) !important;
+}
+
+.snapshot-settings-fields small {
+  color: var(--dialog-muted) !important;
+}
+
+:is(.snapshot-settings-popover, .table-page-settings-popover)[data-theme] :is(input, select):focus {
+  border-color: var(--overlay-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--overlay-accent) 22%, transparent);
+}
+
+:is(.snapshot-settings-popover, .table-page-settings-popover)[data-theme] option {
+  color: var(--overlay-text) !important;
+  background: var(--overlay-control) !important;
+}
+
+:is(
+    .snapshot-settings-popover,
+    .gacha-uid-options,
+    .url-history-popover,
+    .table-page-settings-popover
+  )[data-theme]
+  small {
+  color: var(--overlay-muted) !important;
+}
+
+.gacha-uid-options[data-theme] {
+  display: grid;
+  gap: 6px;
+}
+
+.gacha-uid-options[data-theme] > button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid transparent !important;
+  border-radius: 9px !important;
+  color: var(--overlay-text) !important;
+  background: var(--overlay-raised) !important;
+}
+
+.gacha-uid-options[data-theme] > button:is(:hover, :focus-visible, .active) {
+  border-color: var(--overlay-accent) !important;
+  color: var(--overlay-text) !important;
+  background: var(--overlay-hover) !important;
+}
+
+.url-history-popover[data-theme] > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 8px 10px;
+  border-bottom: 1px solid var(--overlay-line) !important;
+  color: var(--overlay-text) !important;
+  background: transparent !important;
+}
+
+.url-history-popover[data-theme] > header small,
+.url-history-popover[data-theme] time {
+  color: var(--overlay-muted) !important;
+}
+
+.url-history-popover[data-theme] .url-history-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  margin-top: 6px;
+  overflow: hidden;
+  border: 1px solid transparent !important;
+  border-radius: 9px !important;
+  color: var(--overlay-text) !important;
+  background: var(--overlay-raised) !important;
+}
+
+.url-history-popover[data-theme] .url-history-row:hover {
+  border-color: var(--overlay-accent) !important;
+  background: var(--overlay-hover) !important;
+}
+
+.url-history-popover[data-theme] .url-history-row > button:first-child {
+  color: inherit !important;
+  background: transparent !important;
+}
+
+.url-history-popover[data-theme] .url-history-row:hover time {
+  color: var(--overlay-text) !important;
+}
+
+.url-history-popover[data-theme] .url-history-row i {
+  border: 1px solid currentColor;
+  color: #effff9 !important;
+  background: #087358 !important;
+}
+
+.url-history-popover[data-theme] .url-history-row i.custom {
+  color: #fff8ff !important;
+  background: #704394 !important;
+}
+
+.url-history-popover[data-theme] .history-delete {
+  color: #ffb7b7 !important;
+  background: transparent !important;
+}
+
+.url-history-popover[data-theme='light'] .history-delete {
+  color: #a52f3b !important;
+}
+
+.url-history-popover[data-theme] .history-delete:hover {
+  color: #ffffff !important;
+  background: #9c3540 !important;
+}
+
+:is(.snapshot-settings-popover, .gacha-uid-options)[data-theme]:popover-open {
+  display: grid;
+}
+
+:is(
+  .snapshot-settings-popover,
+  .gacha-uid-options,
+  .url-history-popover,
+  .url-history-empty,
+  .table-page-settings-popover
+)[data-theme='contrast'] {
+  --overlay-bg: #1b100c;
+  --overlay-raised: #2a1811;
+  --overlay-hover: #4a2b1c;
+  --overlay-control: #120906;
+  --overlay-text: #fff8ea;
+  --overlay-muted: #d7bea2;
+  --overlay-line: #806044;
+  --overlay-accent: #ffc13d;
+  color-scheme: dark;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.86) !important;
+}
+
+.luck-summary {
+  position: relative;
+}
+
+.luck-help-button {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--t-line, rgba(145, 186, 194, 0.4));
+  border-radius: 50%;
+  color: var(--t-text, #e8f4f3);
+  background: var(--t-control, rgba(7, 23, 29, 0.88));
+  font-weight: 800;
+  line-height: 1;
+  place-items: center;
+  cursor: pointer;
+}
+
+.luck-help-button:hover {
+  border-color: var(--t-accent, #67d6cf);
+  color: var(--t-accent, #67d6cf);
+  transform: translateY(-1px);
+}
+
+.gacha-help-backdrop {
+  --help-bg: #122f38;
+  --help-raised: #1b3d47;
+  --help-text: #effbfa;
+  --help-muted: #b6cccf;
+  --help-line: #436c73;
+  --help-accent: #70ddd3;
+  position: fixed;
+  z-index: 2147483646;
+  inset: 0;
+  display: grid;
+  padding: 24px;
+  color: var(--help-text);
+  background: rgba(2, 8, 11, 0.72);
+  backdrop-filter: blur(10px);
+  place-items: center;
+}
+
+.gacha-help-backdrop[data-theme='light'] {
+  --help-bg: #fbfdfd;
+  --help-raised: #edf3f4;
+  --help-text: #14252a;
+  --help-muted: #536a70;
+  --help-line: #a9c1c5;
+  --help-accent: #147f82;
+  background: rgba(28, 43, 48, 0.38);
+}
+
+.gacha-help-backdrop[data-theme='contrast'] {
+  --help-bg: #1b100c;
+  --help-raised: #2a1811;
+  --help-text: #fff3df;
+  --help-muted: #d9c0a4;
+  --help-line: #806044;
+  --help-accent: #ffc13d;
+}
+
+.gacha-help-dialog {
+  width: min(760px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: auto;
+  border: 1px solid var(--help-line);
+  border-radius: 18px;
+  color: var(--help-text);
+  background: var(--help-bg);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
+}
+
+.gacha-help-dialog > header {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--help-line);
+  background: var(--help-bg);
+}
+
+.gacha-help-dialog :is(h2, h3, p, small, b, span, dt, dd) {
+  color: inherit !important;
+}
+
+.gacha-help-dialog h2,
+.gacha-help-dialog h3,
+.gacha-help-dialog p {
+  margin: 0;
+}
+
+.gacha-help-dialog header small,
+.gacha-help-dialog .gacha-help-note,
+.gacha-help-dialog dd {
+  color: var(--help-muted) !important;
+}
+
+.gacha-help-dialog header button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--help-line);
+  border-radius: 10px;
+  color: var(--help-text);
+  background: var(--help-raised);
+  font-size: 22px;
+}
+
+.gacha-help-dialog > section {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--help-line);
+}
+
+.luck-grade-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.luck-grade-list > div,
+.gacha-help-dialog dl > div {
+  border: 1px solid var(--help-line);
+  border-radius: 12px;
+  background: var(--help-raised);
+}
+
+.luck-grade-list > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.luck-grade-list b,
+.gacha-help-dialog dt {
+  color: var(--help-accent) !important;
+}
+
+.gacha-help-dialog dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.gacha-help-dialog dl > div {
+  padding: 11px 12px;
+}
+
+.gacha-help-dialog dd {
+  margin: 5px 0 0;
+  line-height: 1.55;
+}
+
+@media (max-width: 680px) {
+  .gacha-help-backdrop {
+    padding: 10px;
+  }
+  .gacha-help-dialog {
+    max-height: calc(100vh - 20px);
+  }
+  .luck-grade-list,
+  .gacha-help-dialog dl {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Navigation follows the analysis tabs: unchanged surface/type, bottom-edge emphasis only. */
+#app .shell .sidebar .nav-item,
+#app .shell .sidebar .nav-item * {
+  color: var(--ui-text) !important;
+  text-shadow: none !important;
+}
+
+#app .shell .sidebar .nav-item {
+  border: 1px solid transparent !important;
+  border-bottom-width: 2px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+#app .shell .sidebar .nav-item:not(.active):not(:disabled):hover {
+  border-color: transparent !important;
+  border-left-color: color-mix(in srgb, var(--ui-accent) 32%, transparent) !important;
+  border-bottom-color: color-mix(in srgb, var(--ui-accent) 52%, transparent) !important;
+  background: transparent !important;
+  box-shadow: inset 2px -2px 8px color-mix(in srgb, var(--ui-accent) 7%, transparent) !important;
+}
+
+#app .shell .sidebar .nav-item.active,
+#app .shell .sidebar .nav-item.active:hover {
+  border: 0 !important;
+  color: var(--ui-text) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#app .shell.highlight-scope-navigation .sidebar .nav-item:hover:not(:disabled) {
+  border-color: transparent !important;
+  color: var(--t-strong) !important;
+  background: var(--selection-hover-background) !important;
+  box-shadow: var(--selection-hover-shadow) !important;
+  transform: var(--selection-hover-transform);
+}
+
+#app .shell .sidebar .nav-item:disabled {
+  opacity: 0.45;
+}
+
+/* Gacha command row ---------------------------------------------------------
+   Keep this pass after the legacy segmented-control rules. The UID trigger is
+   a standalone control and must not inherit the grey/transparent button skin. */
+#app .shell .gacha-content .gacha-commandbar,
+#app .shell .gacha-content .url-input-group,
+#app .shell .gacha-content :is(.gacha-uid-select, .url-field, .url-history) {
+  box-sizing: border-box;
+}
+
+#app .shell.theme-light .gacha-content:not(.gacha-high-contrast) .gacha-commandbar {
+  border-color: #b7c7cb !important;
+  background: #f7fafb !important;
+  box-shadow: 0 8px 24px rgba(38, 61, 68, 0.08) !important;
+  backdrop-filter: none !important;
+}
+
+#app
+  .shell.theme-light
+  .gacha-content:not(.gacha-high-contrast)
+  :is(.gacha-uid-select, .url-field, .url-history) {
+  border-color: #a8bbc0 !important;
+  color: #17282d !important;
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+#app
+  .shell.theme-light
+  .gacha-content:not(.gacha-high-contrast)
+  .gacha-uid-select
+  > .gacha-popover-trigger {
+  border: 1px solid #a8bbc0 !important;
+  border-radius: 9px !important;
+  color: #17282d !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  opacity: 1 !important;
+}
+
+#app
+  .shell.theme-light
+  .gacha-content:not(.gacha-high-contrast)
+  .gacha-uid-select
+  > .gacha-popover-trigger
+  :is(span, b),
+#app .shell.theme-light .gacha-content:not(.gacha-high-contrast) .url-field :is(span, input) {
+  color: #17282d !important;
+}
+
+#app .shell .gacha-content .url-input-group,
+#app .shell .gacha-content .gacha-uid-select,
+#app .shell .gacha-content .gacha-uid-select > .gacha-popover-trigger,
+#app .shell .gacha-content .url-field,
+#app .shell .gacha-content .url-field > input {
+  min-height: 38px;
+}
+
+#app .shell .gacha-content .gacha-uid-select > .gacha-popover-trigger {
+  width: 170px !important;
+  max-width: 170px !important;
+  height: 38px;
+  max-height: 38px;
+  align-self: start;
+  min-width: 170px;
+  padding: 0 10px !important;
+}
+#app .shell .gacha-content .gacha-uid-select {
+  width: 170px !important;
+  min-width: 170px !important;
+  max-width: 170px !important;
+  align-self: start;
+}
+
+/* Native popovers live in Chromium's top layer. Give them an entirely opaque
+   paint surface and anchor the UID menu to the trigger's left edge. */
+:is(
+    .snapshot-settings-popover,
+    .gacha-uid-options,
+    .url-history-popover,
+    .url-history-empty,
+    .table-page-settings-popover
+  )[data-theme]:popover-open {
+  z-index: 2147483647 !important;
+  background-color: var(--overlay-bg) !important;
+  background-image: none !important;
+  background-clip: padding-box !important;
+  opacity: 1 !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  isolation: isolate;
+}
+
+.gacha-uid-options[data-theme] {
+  position-anchor: --uid-trigger;
+  position-area: bottom span-left;
+  position-try-fallbacks: flip-block, flip-inline;
+  width: min(300px, calc(100vw - 32px));
+  margin-top: 8px;
+}
+
+.snapshot-settings-popover[data-theme] {
+  position-anchor: --snapshot-trigger;
+  position-area: bottom span-left;
+  position-try-fallbacks: flip-block, flip-inline;
+  width: max-content !important;
+  min-width: min(400px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  margin-top: 8px;
+}
+
+:is(.snapshot-settings-popover, .gacha-uid-options)[data-theme]::backdrop {
+  background: transparent !important;
+}
+
+/* The contrast option belongs to the analysis surface, so the command row must
+   use the same palette even when the application shell itself is light. */
+#app .shell .gacha-content.gacha-high-contrast .gacha-commandbar {
+  border-color: #735237 !important;
+  color: #fff8ea !important;
+  background: #1b100c !important;
+  background-image: none !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.38) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+#app .shell .gacha-content.gacha-high-contrast .url-input-group {
+  border: 0 !important;
+  color: #fff8ea !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+#app .shell .gacha-content.gacha-high-contrast :is(.gacha-uid-select, .url-field, .url-history) {
+  border-color: #806044 !important;
+  color: #fff8ea !important;
+  background: #120906 !important;
+  background-image: none !important;
+  opacity: 1 !important;
+}
+
+#app
+  .shell
+  .gacha-content.gacha-high-contrast
+  :is(.gacha-uid-select > .gacha-popover-trigger, .url-history > .gacha-popover-trigger) {
+  border-color: #806044 !important;
+  color: #fff8ea !important;
+  background: #120906 !important;
+  background-image: none !important;
+  opacity: 1 !important;
+}
+
+#app .shell .gacha-content.gacha-high-contrast .url-field > span {
+  border-color: #806044 !important;
+  color: #ffe0a0 !important;
+  background: #2a1811 !important;
+}
+
+#app .shell .gacha-content.gacha-high-contrast .url-field > input {
+  color: #fff8ea !important;
+  background: #120906 !important;
+}
+
+#app .shell .gacha-content.gacha-high-contrast .url-field > input::placeholder {
+  color: #bda98f !important;
+}
+
+#app .shell .gacha-content.gacha-high-contrast .gacha-commandbar button:not(.primary-button) {
+  border-color: #806044 !important;
+  color: #fff8ea !important;
+  background: #1b100c !important;
+  background-image: none !important;
+}
+
+#app .shell .gacha-content.gacha-high-contrast .url-input-group > button.primary-button {
+  border-color: #d99b25 !important;
+  color: #241306 !important;
+  background: #ffc13d !important;
+  background-image: none !important;
+}
+
+#app .shell .gacha-content.gacha-high-contrast .url-input-group > button:disabled {
+  border-color: #60462f !important;
+  color: #ad987d !important;
+  background: #1b100c !important;
+  background-image: none !important;
+  opacity: 1 !important;
+}
+
+#app .shell .gacha-content.gacha-high-contrast .url-input-group > button:hover:not(:disabled) {
+  border-color: #ffc13d !important;
+  color: #fff8ea !important;
+  background: #4a2b1c !important;
+}
+
+#app
+  .shell
+  .gacha-content.gacha-high-contrast
+  .url-input-group
+  > button.primary-button:hover:not(:disabled) {
+  color: #160d09 !important;
+  background: #ffd36c !important;
+}
+
+/* The UID menu is sized from its anchor instead of an unrelated fixed width,
+   keeping both edges aligned at every window size. */
+.gacha-uid-options[data-theme] {
+  width: anchor-size(width, 170px) !important;
+  min-width: anchor-size(width, 170px) !important;
+  max-width: min(360px, calc(100vw - 24px)) !important;
+}
+
+/* Final top-layer paint pass. Popovers are deliberately opaque so content
+   underneath can never bleed through, including on a light application shell. */
+:is(.snapshot-settings-popover, .gacha-uid-options)[data-theme]:popover-open {
+  position: fixed;
+  z-index: 2147483647 !important;
+  overflow: hidden !important;
+  border-color: var(--overlay-line) !important;
+  color: var(--overlay-text) !important;
+  background: var(--overlay-bg) !important;
+  background-color: var(--overlay-bg) !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  isolation: isolate;
+}
+
+:is(.snapshot-settings-popover, .gacha-uid-options)[data-theme='contrast']:popover-open {
+  color-scheme: dark;
+  box-shadow:
+    0 0 0 1px rgba(255, 193, 61, 0.16),
+    0 26px 72px rgba(0, 0, 0, 0.88) !important;
+}
+
+/* Keep every analysis popover on the same final surface as ThemedSelect.
+   This file loads after the shared theme, so the final pass belongs here. */
+:is(
+    .snapshot-settings-popover,
+    .gacha-uid-options,
+    .url-history-popover,
+    .url-history-empty,
+    .table-page-settings-popover
+  )[data-theme]:popover-open {
+  border: 1px solid var(--overlay-line) !important;
+  border-radius: 13px !important;
+  color: var(--overlay-text) !important;
+  background: color-mix(in srgb, var(--overlay-bg) 96%, transparent) !important;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.42) !important;
+  backdrop-filter: blur(20px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.15) !important;
+}
+
+.gacha-help-dialog.dialog-surface {
+  border-color: var(--dialog-line) !important;
+  border-radius: 13px !important;
+  color: var(--dialog-text) !important;
+  background: var(--dialog-bg) !important;
+  box-shadow: var(--dialog-shadow) !important;
+  backdrop-filter: blur(24px) saturate(1.18) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.18) !important;
+}
+
+/* Version management is the canonical dialog. This final contract gives every
+   dialog its geometry while leaving the page outside and all children clear. */
+#app-dialog-root {
+  display: contents;
+}
+#app .shell :is(.modal-backdrop, .dialog-backdrop),
+body > .shell.modal-theme-host :is(.modal-backdrop, .dialog-backdrop),
+.shell :is(.modal-backdrop, .dialog-backdrop) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+body > .shell.modal-theme-host {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 40000 !important;
+  display: block !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+body > .shell.modal-theme-host::before,
+body > .shell.modal-theme-host::after {
+  display: none !important;
+  content: none !important;
+}
+body > .shell.modal-theme-host > :is(.modal-backdrop, .dialog-backdrop),
+#app .shell :is(.modal-backdrop, .dialog-backdrop),
+.shell :is(.modal-backdrop, .dialog-backdrop) {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 40000 !important;
+  display: grid !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  place-items: center !important;
+  padding: 24px !important;
+  overflow: hidden !important;
+  pointer-events: auto !important;
+}
+#app .shell .dialog-surface,
+body > .shell.modal-theme-host .dialog-surface,
+.shell .dialog-surface {
+  position: relative !important;
+  inset: auto !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  align-content: start;
+  gap: 12px !important;
+  width: max-content;
+  min-width: min(360px, calc(100vw - 32px));
+  max-width: min(920px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  margin: 0 !important;
+  padding: 18px !important;
+  overflow: auto !important;
+  border: 1px solid var(--dialog-line) !important;
+  border-radius: 16px !important;
+  color: var(--dialog-text) !important;
+  background: var(--dialog-bg) !important;
+  background-image: none !important;
+  box-shadow: var(--dialog-shadow) !important;
+  backdrop-filter: blur(24px) saturate(1.18) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.18) !important;
+  transform: none !important;
+}
+#app .shell .dialog-surface > header,
+body > .shell.modal-theme-host .dialog-surface > header,
+.shell .dialog-surface > header {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 !important;
+  padding: 0 0 10px !important;
+  border-bottom: 1px solid var(--dialog-line) !important;
+}
+#app .shell .dialog-surface > header .account-header-actions,
+body > .shell.modal-theme-host .dialog-surface > header .account-header-actions,
+.shell .dialog-surface > header .account-header-actions {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+#app .shell .dialog-surface > header > :first-child,
+body > .shell.modal-theme-host .dialog-surface > header > :first-child,
+.shell .dialog-surface > header > :first-child {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+#app .shell .dialog-surface > header strong,
+body > .shell.modal-theme-host .dialog-surface > header strong,
+.shell .dialog-surface > header strong {
+  color: var(--dialog-text) !important;
+  font-size: 17px;
+}
+#app .shell .dialog-surface > header > button:last-child,
+body > .shell.modal-theme-host .dialog-surface > header > button:last-child,
+.shell .dialog-surface > header > button:last-child {
+  display: grid !important;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  padding: 0 !important;
+  border: 1px solid var(--dialog-line) !important;
+  border-radius: 8px !important;
+  color: var(--dialog-text) !important;
+  font-size: 20px;
+  line-height: 1;
+}
+#app .shell .dialog-surface > header button[title='关闭'],
+body > .shell.modal-theme-host .dialog-surface > header button[title='关闭'],
+.shell .dialog-surface > header button[title='关闭'] {
+  position: relative !important;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0 !important;
+  border: 1px solid var(--dialog-line) !important;
+  border-radius: 8px !important;
+  pointer-events: auto !important;
+}
+#app .shell .dialog-surface *,
+body > .shell.modal-theme-host .dialog-surface *,
+.shell .dialog-surface * {
+  background-color: transparent !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.shell .dialog-surface > .account-switch-preference {
+  display: flex !important;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 !important;
+  padding: 0 0 12px !important;
+  border-bottom: 1px solid var(--dialog-line) !important;
+}
+.shell .dialog-surface > .account-switch-preference > span {
+  display: grid;
+  gap: 3px;
+}
+.shell .dialog-surface > .account-switch-preference > input {
+  flex: 0 0 auto;
+}
+
+/* The shell already reserves the title-bar height. A second sticky offset can
+   move the navigation down during a theme-triggered layout recalculation. */
+#app > .shell > .sidebar {
+  top: 0 !important;
+}
+
+/* Parent rows may be much wider than their fields. Only the field under the
+   actual pointer receives the configured hover treatment. */
+#app .shell :is(input, textarea)[data-precise-hover='true'],
+body > .shell.modal-theme-host :is(input, textarea)[data-precise-hover='true'],
+.shell :is(input, textarea)[data-precise-hover='true'] {
+  border-color: var(--selection-hover-color) !important;
+  box-shadow: var(--selection-hover-shadow) !important;
+  transform: var(--selection-hover-transform);
+}
+.shell .dialog-surface.account-editor-dialog :is(input, textarea)[data-precise-hover='true'] {
+  box-shadow: inset 0 0 0 1px var(--selection-hover-color) !important;
+  transform: none !important;
+}
+
+/* Title-bar controls participate in the same default/configured hover style. */
+#app .shell .window-controls button:hover:not(:disabled),
+.shell .window-controls button:hover:not(:disabled) {
+  color: var(--t-strong) !important;
+  background: var(--selection-hover-background) !important;
+  box-shadow: var(--selection-hover-shadow) !important;
+  transform: var(--selection-hover-transform);
+}

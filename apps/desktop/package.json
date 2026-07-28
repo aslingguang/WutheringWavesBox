@@ -28,7 +28,7 @@
   "devDependencies": {
     "@types/node": "^24.10.0",
     "@vitejs/plugin-vue": "^6.0.8",
-    "electron": "^43.1.1",
+    "electron": "43.1.1",
     "electron-builder": "^26.0.12",
     "electron-vite": "^5.0.0",
     "typescript": "^5.9.3",
@@ -50,9 +50,18 @@
       {
         "from": "release-helper",
         "to": "helper"
+      },
+      {
+        "from": "resources/default-wallpaper.jpg",
+        "to": "default-wallpaper.jpg"
+      },
+      {
+        "from": "resources/icon.png",
+        "to": "icon.png"
       }
     ],
     "win": {
+      "icon": "resources/icon.png",
       "target": [
         {
           "target": "nsis",

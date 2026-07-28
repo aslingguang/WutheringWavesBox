@@ -43,9 +43,9 @@ const closeAccountManagerAfterSwitch = ref(
 );
 const editingAccountId = ref<string | undefined>();
 const themeStyle = ref<'glass' | 'dark' | 'light'>(
-  (localStorage.getItem('wwbox.themeStyle') as 'glass' | 'dark' | 'light') || 'glass',
+  (localStorage.getItem('wwbox.themeStyle') as 'glass' | 'dark' | 'light') || 'dark',
 );
-const themeOpacity = ref(Number(localStorage.getItem('wwbox.themeOpacity') || 82));
+const themeOpacity = ref(Number(localStorage.getItem('wwbox.themeOpacity') || 30));
 const highlightTop = ref(localStorage.getItem('wwbox.highlightTop') === 'true');
 const highlightRight = ref(localStorage.getItem('wwbox.highlightRight') === 'true');
 const highlightBottom = ref(localStorage.getItem('wwbox.highlightBottom') !== 'false');
@@ -97,7 +97,7 @@ const wallpaperFillSaturation = ref(
 );
 const wallpaperFillScale = ref(Number(localStorage.getItem('wwbox.wallpaperFillScale') || 106));
 const reduceMotion = ref(localStorage.getItem('wwbox.reduceMotion') === 'true');
-const sidebarWallpaper = ref(localStorage.getItem('wwbox.sidebarWallpaper') === 'true');
+const sidebarWallpaper = ref(localStorage.getItem('wwbox.sidebarWallpaper') !== 'false');
 const wallpaperMode = ref<'default' | 'image' | 'folder'>(savedWallpaperMode);
 const defaultWallpaperDirectory = ref('');
 const autoStart = ref(localStorage.getItem('wwbox.autoStart') === 'true');

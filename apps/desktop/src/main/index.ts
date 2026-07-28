@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import {
   app,
   BrowserWindow,
@@ -236,6 +236,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     show: false,
     title: 'WutheringWavesBox',
+    icon: bundledResourcePath('icon.png'),
     frame: false,
     backgroundColor: '#0b1015',
     webPreferences: {
@@ -992,7 +993,18 @@ async function resolveWallpaper(
 function ensureDefaultWallpaperDirectory(): string {
   const directory = join(app.getPath('userData'), 'wallpapers', 'default');
   mkdirSync(directory, { recursive: true });
+  const destination = join(directory, 'default-wallpaper.jpg');
+  const bundledWallpaper = bundledResourcePath('default-wallpaper.jpg');
+  if (!existsSync(destination) && existsSync(bundledWallpaper)) {
+    copyFileSync(bundledWallpaper, destination);
+  }
   return directory;
+}
+
+function bundledResourcePath(fileName: string): string {
+  return app.isPackaged
+    ? join(process.resourcesPath, fileName)
+    : join(__dirname, '../../resources', fileName);
 }
 
 function listWallpaperImages(sourcePath: string): string[] {

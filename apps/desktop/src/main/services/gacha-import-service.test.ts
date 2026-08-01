@@ -42,4 +42,34 @@ describe('GachaImportService', () => {
       languageCode: 'zh-Hans',
     });
   });
+
+  it('keeps numeric-string resource ids used by newly released characters', async () => {
+    const fetchMock = vi.fn().mockImplementation(async (_url, input: RequestInit) => {
+      const pool = JSON.parse(String(input.body)).cardPoolType;
+      return new Response(
+        JSON.stringify({
+          code: 0,
+          data:
+            pool === '1'
+              ? [
+                  {
+                    recordId: 'new',
+                    resourceId: '1610',
+                    qualityLevel: 5,
+                    resourceType: '角色',
+                    name: '新限定角色',
+                    time: '2026-07-10 12:00:00',
+                  },
+                ]
+              : [],
+        }),
+        { status: 200 },
+      );
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const result = await new GachaImportService().fetch(
+      'https://example.com/?playerId=123456789&recordId=temporary',
+    );
+    expect(result.records[0]?.resourceId).toBe(1610);
+  });
 });

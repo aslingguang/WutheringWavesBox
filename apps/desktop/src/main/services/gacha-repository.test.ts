@@ -155,6 +155,26 @@ describe('GachaRepository', () => {
     expect(pool?.fiveStars.map((star) => star.featured)).toEqual([false, true]);
   });
 
+  it('recognizes newly released event characters without version metadata', () => {
+    repository = new GachaRepository(':memory:');
+    repository.upsert([
+      {
+        recordId: 'future-limited', recordOrder: 0, playerId: '123456789', poolType: '1',
+        resourceId: 1999, qualityLevel: 5, resourceType: '角色', name: '未来限定角色',
+        time: '2030-01-01 12:00:00',
+      },
+      {
+        recordId: 'future-standard', recordOrder: 1, playerId: '123456789', poolType: '1',
+        resourceId: 1104, qualityLevel: 5, resourceType: '角色', name: '忌炎之外的常驻角色',
+        time: '2030-01-01 12:01:00',
+      },
+    ]);
+    expect(
+      repository.analysis('123456789').pools.find((item) => item.poolType === '1')?.fiveStars
+        .map((star) => star.featured),
+    ).toEqual([false, true]);
+  });
+
   it('normalizes API pool names into analysis pool numbers', () => {
     repository = new GachaRepository(':memory:');
     repository.upsert([

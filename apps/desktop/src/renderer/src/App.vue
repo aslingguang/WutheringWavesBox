@@ -10,7 +10,6 @@ import battlePassIcon from './assets/game-info/battle-pass.png';
 import resonatorsIcon from './assets/game-info/resonators.svg';
 import weeklyTravelIcon from './assets/game-info/weekly-travel.svg';
 import KuroPage from './components/KuroPage.vue';
-import HighQualityImage from './components/HighQualityImage.vue';
 import ThemedSelect from './components/ThemedSelect.vue';
 import AppDialog from './components/AppDialog.vue';
 import type {
@@ -128,13 +127,7 @@ const displaySettings = ref<GameDisplaySettings | null>(null);
 const displaySettingsLoading = ref(false);
 const displaySettingsSaving = ref(false);
 const displaySettingsMessage = ref('');
-const resolutionPresets = [
-  { label: '1280 x 720', width: 1280, height: 720 },
-  { label: '1600 x 900', width: 1600, height: 900 },
-  { label: '1920 x 1080', width: 1920, height: 1080 },
-  { label: '2560 x 1440', width: 2560, height: 1440 },
-  { label: '3840 x 2160', width: 3840, height: 2160 },
-];
+const resolutionPresets = ref<Array<{ label: string; width: number; height: number }>>([]);
 const selectedGachaInstallationId = ref('');
 const gachaMessage = ref<{ type: 'success' | 'error'; text: string } | null>(null);
 const accounts = ref<AccountProfile[]>([]);
@@ -766,14 +759,17 @@ function identifyUidFromUrl(value: string): string | null {
 }
 async function loadGachaImages(): Promise<void> {
   if (!gachaAnalysis.value) return;
-  const ids = [
-    ...new Set(
+  const resources = [
+    ...new Map(
       gachaAnalysis.value.recentRecords
-        .filter((record) => record.qualityLevel >= 4)
-        .map((record) => record.resourceId),
-    ),
+        .filter((record) => record.qualityLevel >= 4 && record.resourceId > 0)
+        .map((record) => [
+          record.resourceId,
+          { resourceId: record.resourceId, name: record.name, resourceType: record.resourceType },
+        ]),
+    ).values(),
   ];
-  gachaImages.value = await window.wwbox.gachaAnalysis.images(ids);
+  gachaImages.value = await window.wwbox.gachaAnalysis.images(resources);
 }
 
 async function openHome(): Promise<void> {
@@ -808,15 +804,36 @@ async function scanLauncherAccounts(): Promise<void> {
 
 async function loadKuroHomeWidget(): Promise<void> {
   const playerId = currentPlayerId.value;
+  const requestId = ++kuroHomeWidgetRequestId;
   if (!playerId) {
     kuroHomeWidget.value = null;
     return;
   }
   try {
-    kuroHomeWidget.value = await window.wwbox.kuro.homeWidget(playerId);
+    const widget = await window.wwbox.kuro.homeWidget(playerId);
+    if (requestId === kuroHomeWidgetRequestId && currentPlayerId.value === playerId)
+      kuroHomeWidget.value = widget;
   } catch {
-    kuroHomeWidget.value = null;
+    if (requestId === kuroHomeWidgetRequestId && currentPlayerId.value === playerId)
+      kuroHomeWidget.value = null;
   }
+}
+
+let kuroHomeWidgetRequestId = 0;
+
+async function loadDisplayResolutions(): Promise<void> {
+  const available = await window.wwbox.game.listDisplayResolutions().catch(() => []);
+  const current = displaySettings.value
+    ? [{ width: displaySettings.value.width, height: displaySettings.value.height }]
+    : [];
+  resolutionPresets.value = [...available, ...current]
+    .filter(
+      (item, index, values) =>
+        values.findIndex((value) => value.width === item.width && value.height === item.height) ===
+        index,
+    )
+    .sort((left, right) => right.width * right.height - left.width * left.height)
+    .map((item) => ({ ...item, label: `${item.width} x ${item.height}` }));
 }
 
 function readCachedLauncherAccounts(): LauncherAccount[] {
@@ -1212,6 +1229,7 @@ async function loadDisplaySettings(): Promise<void> {
     displaySettings.value = await window.wwbox.game.getDisplaySettings(
       quickSettingsInstallationId.value,
     );
+    await loadDisplayResolutions();
     if (
       displaySettings.value.available &&
       !localStorage.getItem('wwbox.quickGameSettings.general')
@@ -1232,7 +1250,7 @@ async function loadDisplaySettings(): Promise<void> {
 }
 
 function selectResolution(value: string): void {
-  const preset = resolutionPresets.find((item) => `${item.width}x${item.height}` === value);
+  const preset = resolutionPresets.value.find((item) => `${item.width}x${item.height}` === value);
   if (preset) {
     editableQuickSettings.value.width = preset.width;
     editableQuickSettings.value.height = preset.height;
@@ -2496,7 +2514,7 @@ onUnmounted(() => {
                       <img
                         v-if="gachaImages[String(star.resourceId)]"
                         class="quality-image quality-image-5"
-                        :src="gachaImages[String(star.resourceId)]"
+                        :src="gachaImages[String(star.resourceId)] ?? ''"
                         :alt="star.name"
                       /><span v-else class="gacha-image-fallback">5★</span
                       ><span class="star-record-copy"
@@ -2574,7 +2592,7 @@ onUnmounted(() => {
                       <img
                         v-if="gachaImages[String(star.resourceId)]"
                         class="quality-image quality-image-5"
-                        :src="gachaImages[String(star.resourceId)]"
+                        :src="gachaImages[String(star.resourceId)] ?? ''"
                         :alt="star.name"
                       /><span v-else class="star-orb">5★</span><strong>{{ star.name }}</strong
                       ><b>{{ star.pity }} 抽</b><small>{{ star.time }}</small
@@ -2647,7 +2665,7 @@ onUnmounted(() => {
                         <img
                           v-if="gachaImages[String(item.resourceId)]"
                           :class="`quality-image quality-image-${item.qualityLevel}`"
-                          :src="gachaImages[String(item.resourceId)]"
+                          :src="gachaImages[String(item.resourceId)] ?? ''"
                           :alt="item.name"
                         /><span v-else>{{ item.qualityLevel }}★</span
                         ><i
@@ -2731,7 +2749,7 @@ onUnmounted(() => {
                               ><img
                                 v-if="gachaImages[String(record.resourceId)]"
                                 :class="`quality-image quality-image-${record.qualityLevel}`"
-                                :src="gachaImages[String(record.resourceId)]"
+                                :src="gachaImages[String(record.resourceId)] ?? ''"
                                 :alt="record.name"
                               />{{ record.name }}</span
                             >

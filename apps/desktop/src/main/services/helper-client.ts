@@ -10,6 +10,7 @@ import {
   type GameInstallation,
   type GameProcessState,
   type GameValidationResult,
+  type DisplayResolution,
   type LaunchGameInput,
   type CopyConveneUrlResult,
   type RpcRequest,
@@ -41,6 +42,10 @@ export class HelperClient {
 
   detectGameInstallations(): Promise<GameInstallation[]> {
     return this.invoke<GameInstallation[]>('game.detectInstallations', {});
+  }
+
+  getDisplayResolutions(): Promise<DisplayResolution[]> {
+    return this.invoke<DisplayResolution[]>('game.getDisplayResolutions', {});
   }
 
   validateGameInstallation(rootPath: string): Promise<GameValidationResult> {

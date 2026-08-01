@@ -222,5 +222,14 @@ function analyzePool(poolType: string, records: GachaRecord[]): GachaPoolAnalysi
   };
 }
 function isFeaturedRecord(record: GachaRecord): boolean | null {
+  // Character event pools can always be classified from the permanent five-star
+  // roster. This remains correct when a new event banner launches before version
+  // metadata has been updated. Event weapon banners do not have off-banner
+  // five-stars, so every five-star weapon there is featured.
+  if (['2', '11'].includes(record.poolType)) return true;
+  if (['1', '10'].includes(record.poolType))
+    return !PERMANENT_FIVE_STAR_CHARACTER_IDS.has(record.resourceId);
   return isFeaturedGachaItem(record.time, record.poolType, record.resourceId);
 }
+
+const PERMANENT_FIVE_STAR_CHARACTER_IDS = new Set([1104, 1301, 1403, 1503, 1601]);

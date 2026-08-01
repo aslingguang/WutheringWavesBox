@@ -42,6 +42,7 @@ public sealed class RpcServer(TextReader input, TextWriter output)
         {
             "system.health" => Success(request.Id, SystemService.Health()),
             "game.detectInstallations" => Success(request.Id, GameInstallationService.DetectInstallations()),
+            "game.getDisplayResolutions" => Success(request.Id, DisplayModeService.GetResolutions()),
             "game.validateInstallation" => ValidateInstallation(request),
             "game.launch" => LaunchGame(request),
             "game.getProcessState" => GetGameProcessState(request),

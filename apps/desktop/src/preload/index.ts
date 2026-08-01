@@ -64,6 +64,10 @@ const api: DesktopApi = {
       ipcRenderer.invoke('game.getDisplaySettings', installationId) as ReturnType<
         DesktopApi['game']['getDisplaySettings']
       >,
+    listDisplayResolutions: () =>
+      ipcRenderer.invoke('game.listDisplayResolutions') as ReturnType<
+        DesktopApi['game']['listDisplayResolutions']
+      >,
     saveDisplaySettings: (installationId, input) =>
       ipcRenderer.invoke('game.saveDisplaySettings', installationId, input) as ReturnType<
         DesktopApi['game']['saveDisplaySettings']

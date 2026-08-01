@@ -72,6 +72,39 @@ export class KuroService {
     return this.repository.list();
   }
 
+  async roleAvatarUrls(
+    resources: Array<{ resourceId: number; name: string }>,
+  ): Promise<Record<string, string>> {
+    const result: Record<string, string> = {};
+    if (!resources.length) return result;
+    for (const account of this.repository.list()) {
+      try {
+        const dashboard = await this.dashboard(account.id);
+        const roles = this.findArrayByKeys(dashboard.calculator?.roles, [
+          'roleList',
+          'roles',
+          'list',
+        ]).map((value) => this.asRecord(value));
+        for (const resource of resources) {
+          if (result[String(resource.resourceId)]) continue;
+          const role = roles.find(
+            (item) =>
+              Number(item.roleId ?? item.id ?? item.cardRoleId) === resource.resourceId ||
+              String(item.roleName ?? item.name ?? '').trim() === resource.name.trim(),
+          );
+          if (!role) continue;
+          const url = ['iconUrl', 'icon', 'roleIconUrl', 'roleIcon', 'picUrl', 'imageUrl']
+            .map((key) => role[key])
+            .find((value) => typeof value === 'string' && /^https:\/\//i.test(value));
+          if (typeof url === 'string') result[String(resource.resourceId)] = url;
+        }
+      } catch {
+        // Another configured account may still provide the official role catalogue.
+      }
+    }
+    return result;
+  }
+
   async sendSms(input: KuroSmsInput): Promise<KuroOperationResult> {
     if (!/^1[3-9]\d{9}$/.test(input.phone))
       return { success: false, message: '请输入正确的中国大陆手机号' };
@@ -837,6 +870,7 @@ export class KuroService {
     const account = this.getAccount(id);
     const role = account.roles.find((item) => item.roleId === roleId) ?? this.role(account);
     const key = `${id}:${role.roleId}`;
+    if (force) this.homeWidgetCache.delete(role.roleId);
     const cached = this.cache.get(key);
     if (!force && cached && cached.expires > Date.now()) return cached.value;
     const token = this.token(id);
@@ -1346,6 +1380,7 @@ export class KuroService {
   ): Promise<ApiEnvelope> {
     const response = await fetch(`${API}${path}`, {
       method: options.method ?? 'POST',
+      cache: 'no-store',
       signal: AbortSignal.timeout(20_000),
       headers: {
         'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -1372,6 +1407,7 @@ export class KuroService {
     for (const [name, value] of Object.entries(fields)) body.set(name, value);
     const response = await fetch(`${API}${path}`, {
       method: 'POST',
+      cache: 'no-store',
       signal: AbortSignal.timeout(20_000),
       headers: {
         accept: 'application/json, text/plain, */*',

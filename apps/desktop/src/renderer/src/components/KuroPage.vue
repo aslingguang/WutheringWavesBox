@@ -153,13 +153,13 @@ const daysToNextStreak = computed(() => {
   return next ? Math.max(0, next.day - signDays.value) : 0;
 });
 onMounted(async () => {
-  await reloadAccounts();
+  await reloadAccounts(true);
 });
 
-async function reloadAccounts(): Promise<void> {
+async function reloadAccounts(forceDashboard = false): Promise<void> {
   accounts.value = await window.wwbox.kuro.listAccounts();
   if (activeAccount.value) {
-    await loadDashboard();
+    await loadDashboard(forceDashboard);
     await loadRetroEligibility();
   }
 }
@@ -288,19 +288,19 @@ function startSmsCooldown(): void {
 async function activate(id: string): Promise<void> {
   await window.wwbox.kuro.activate(id);
   dashboard.value = null;
-  await reloadAccounts();
+  await reloadAccounts(true);
 }
 async function selectRole(roleId: string): Promise<void> {
   if (!activeAccount.value) return;
   await window.wwbox.kuro.selectRole(activeAccount.value.id, roleId);
-  await reloadAccounts();
+  await reloadAccounts(true);
 }
 async function refreshRoles(): Promise<void> {
   if (!activeAccount.value) return;
   loading.value = true;
   try {
     await window.wwbox.kuro.refreshRoles(activeAccount.value.id);
-    await reloadAccounts();
+    await reloadAccounts(true);
     notify(true, '角色列表已更新');
   } catch (error) {
     notify(false, errorText(error));

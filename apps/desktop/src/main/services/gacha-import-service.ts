@@ -70,7 +70,7 @@ function readRecords(body: unknown, playerId: string, poolType: string): GachaRe
         recordOrder: index,
         playerId,
         poolType: String(r['cardPoolType'] ?? poolType),
-        resourceId: typeof r['resourceId'] === 'number' ? r['resourceId'] : 0,
+        resourceId: numericId(r['resourceId']),
         qualityLevel: r['qualityLevel'],
         resourceType: typeof r['resourceType'] === 'string' ? r['resourceType'] : 'unknown',
         name: r['name'].slice(0, 100),
@@ -78,4 +78,9 @@ function readRecords(body: unknown, playerId: string, poolType: string): GachaRe
       },
     ];
   });
+}
+
+function numericId(value: unknown): number {
+  const parsed = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : 0;
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : 0;
 }

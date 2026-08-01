@@ -12,6 +12,7 @@ import {
   net,
   safeStorage,
   shell,
+  screen,
 } from 'electron';
 import type {
   AppInfo,
@@ -22,6 +23,7 @@ import type {
   GameVersionState,
   GameDisplaySettings,
   SaveGameDisplaySettingsInput,
+  DisplayResolution,
   LaunchGameInput,
   AccountProfile,
   RedemptionCodeCatalog,
@@ -639,6 +641,41 @@ function registerIpc(): void {
     },
   );
 
+  ipcMain.handle('game.listDisplayResolutions', async (event): Promise<DisplayResolution[]> => {
+    assertTrustedSender(event.sender);
+    if (helperClient) {
+      try {
+        const modes = await helperClient.getDisplayResolutions();
+        if (modes.length) return modes;
+      } catch {
+        // Fall back to the current desktop modes when the helper is unavailable.
+      }
+    }
+    const sizes = screen.getAllDisplays().map((display) => ({
+      width: Math.round(display.size.width * display.scaleFactor),
+      height: Math.round(display.size.height * display.scaleFactor),
+    }));
+    const common = [
+      [1280, 720], [1366, 768], [1600, 900], [1920, 1080], [2560, 1440],
+      [3440, 1440], [3840, 2160], [5120, 1440], [5120, 2880], [7680, 4320],
+    ];
+    const available = common
+      .filter(([width, height]) =>
+        sizes.some(
+          (size) =>
+            width! <= size.width &&
+            height! <= size.height &&
+            Math.abs(width! / height! - size.width / size.height) < 0.03,
+        ),
+      )
+      .map(([width, height]) => ({ width: width!, height: height! }));
+    for (const size of sizes) {
+      if (!available.some((item) => item.width === size.width && item.height === size.height))
+        available.push(size);
+    }
+    return available.sort((left, right) => left.width * left.height - right.width * right.height);
+  });
+
   ipcMain.handle(
     'game.saveDisplaySettings',
     (event, installationId: unknown, input: unknown): GameDisplaySettings => {
@@ -895,15 +932,32 @@ function registerIpc(): void {
   });
   ipcMain.handle(
     'gachaAnalysis.images',
-    async (event, resourceIds: unknown): Promise<Record<string, string>> => {
+    async (event, resources: unknown): Promise<Record<string, string>> => {
       assertTrustedSender(event.sender);
       if (
-        !Array.isArray(resourceIds) ||
-        resourceIds.length > 200 ||
-        resourceIds.some((id) => typeof id !== 'number' || !Number.isInteger(id) || id <= 0)
+        !Array.isArray(resources) ||
+        resources.length > 200 ||
+        resources.some(
+          (item) =>
+            !item ||
+            typeof item !== 'object' ||
+            !Number.isInteger((item as { resourceId?: unknown }).resourceId) ||
+            Number((item as { resourceId?: unknown }).resourceId) <= 0 ||
+            typeof (item as { name?: unknown }).name !== 'string' ||
+            typeof (item as { resourceType?: unknown }).resourceType !== 'string',
+        )
       )
         throw new Error('INVALID_ARGUMENT');
-      return gachaImageService?.get(resourceIds) ?? {};
+      const typed = resources as Array<{
+        resourceId: number;
+        name: string;
+        resourceType: string;
+      }>;
+      const characters = typed.filter(
+        (item) => !(/武器/i.test(item.resourceType) || item.resourceId >= 20_000_000),
+      );
+      const roleAvatarUrls = kuroService ? await kuroService.roleAvatarUrls(characters) : {};
+      return gachaImageService?.get(typed, roleAvatarUrls) ?? {};
     },
   );
   ipcMain.handle('versionMetadata.list', (event): GachaVersionMetadata[] => {
@@ -1358,7 +1412,10 @@ else {
     );
     redemptionCodeService = new RedemptionCodeService(redemptionCodeRepository);
     gachaRepository = new GachaRepository(join(app.getPath('userData'), 'data.db'));
-    gachaImageService = new GachaImageService(join(app.getPath('userData'), 'gacha-images'));
+    gachaImageService = new GachaImageService(
+      join(app.getPath('userData'), 'gacha-images'),
+      kuroArtworkCacheDirectory,
+    );
     versionMetadataService = new VersionMetadataService(
       join(app.getPath('userData'), 'version-metadata.json'),
     );

@@ -76,6 +76,11 @@ export interface GameDisplaySettings {
   height: number;
 }
 
+export interface DisplayResolution {
+  width: number;
+  height: number;
+}
+
 export interface SaveGameDisplaySettingsInput {
   displayMode: GameDisplayMode;
   width: number;
@@ -584,6 +589,7 @@ export interface DesktopApi {
     removeInstallation(installationId: string): Promise<void>;
     checkVersion(installationId: string): Promise<GameVersionState>;
     getDisplaySettings(installationId: string): Promise<GameDisplaySettings>;
+    listDisplayResolutions(): Promise<DisplayResolution[]>;
     saveDisplaySettings(
       installationId: string,
       input: SaveGameDisplaySettingsInput,
@@ -658,7 +664,9 @@ export interface DesktopApi {
     delete(playerId: string): Promise<void>;
     snapshot(input: SnapshotExportInput): Promise<boolean>;
     players(): Promise<string[]>;
-    images(resourceIds: number[]): Promise<Record<string, string>>;
+    images(
+      resources: Array<{ resourceId: number; name: string; resourceType: string }>,
+    ): Promise<Record<string, string>>;
   };
   versionMetadata: {
     list(): Promise<GachaVersionMetadata[]>;

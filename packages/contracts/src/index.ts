@@ -373,6 +373,16 @@ export interface GachaAnalysis {
   recentRecords: GachaRecord[];
 }
 
+export interface GachaImportBatch {
+  id: string;
+  playerId: string;
+  importedAt: string;
+  source: 'manual' | 'game';
+  recordCount: number;
+  addedCount: number;
+  duplicateCount: number;
+}
+
 export interface ImportGachaInput {
   installationId: string;
   url?: string | null;
@@ -381,6 +391,7 @@ export interface ImportGachaInput {
 export interface ImportGachaResult {
   url: string;
   analysis: GachaAnalysis;
+  batch: GachaImportBatch;
 }
 
 export interface SnapshotExportInput {
@@ -662,6 +673,8 @@ export interface DesktopApi {
     get(playerId?: string): Promise<GachaAnalysis | null>;
     export(playerId: string): Promise<boolean>;
     delete(playerId: string): Promise<void>;
+    batches(playerId: string): Promise<GachaImportBatch[]>;
+    deleteBatch(batchId: string): Promise<void>;
     snapshot(input: SnapshotExportInput): Promise<boolean>;
     players(): Promise<string[]>;
     images(

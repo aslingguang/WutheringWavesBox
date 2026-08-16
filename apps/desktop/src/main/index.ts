@@ -656,8 +656,16 @@ function registerIpc(): void {
       height: Math.round(display.size.height * display.scaleFactor),
     }));
     const common = [
-      [1280, 720], [1366, 768], [1600, 900], [1920, 1080], [2560, 1440],
-      [3440, 1440], [3840, 2160], [5120, 1440], [5120, 2880], [7680, 4320],
+      [1280, 720],
+      [1366, 768],
+      [1600, 900],
+      [1920, 1080],
+      [2560, 1440],
+      [3440, 1440],
+      [3840, 2160],
+      [5120, 1440],
+      [5120, 2880],
+      [7680, 4320],
     ];
     const available = common
       .filter(([width, height]) =>
@@ -870,8 +878,8 @@ function registerIpc(): void {
         url = urlResult.url;
       }
       const imported = await gachaImportService.fetch(url);
-      gachaRepository.upsert(imported.records);
-      return { url, analysis: gachaRepository.analysis(imported.playerId) };
+      const batch = gachaRepository.import(imported.records, input.url?.trim() ? 'manual' : 'game');
+      return { url, batch, analysis: gachaRepository.analysis(imported.playerId) };
     },
   );
 
@@ -909,6 +917,22 @@ function registerIpc(): void {
     if (typeof playerId !== 'string' || !/^\d{5,20}$/.test(playerId) || !gachaRepository)
       throw new Error('INVALID_ARGUMENT');
     gachaRepository.deletePlayer(playerId);
+  });
+  ipcMain.handle('gachaAnalysis.batches', (event, playerId: unknown) => {
+    assertTrustedSender(event.sender);
+    if (typeof playerId !== 'string' || !/^\d{5,20}$/.test(playerId) || !gachaRepository)
+      throw new Error('INVALID_ARGUMENT');
+    return gachaRepository.batches(playerId);
+  });
+  ipcMain.handle('gachaAnalysis.deleteBatch', (event, batchId: unknown): void => {
+    assertTrustedSender(event.sender);
+    if (
+      typeof batchId !== 'string' ||
+      !/^(?:legacy-\d{5,20}|[0-9a-f-]{36})$/.test(batchId) ||
+      !gachaRepository
+    )
+      throw new Error('INVALID_ARGUMENT');
+    gachaRepository.deleteBatch(batchId);
   });
   ipcMain.handle('gachaAnalysis.snapshot', async (event, input: unknown): Promise<boolean> => {
     assertTrustedSender(event.sender);

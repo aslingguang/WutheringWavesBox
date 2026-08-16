@@ -25,6 +25,7 @@ import type {
   RedemptionCodeCatalog,
   LauncherAccount,
   GachaAnalysis,
+  GachaImportBatch,
   GachaPoolAnalysis,
   GachaVersionMetadata,
   VersionMetadataUpdatePreview,
@@ -157,6 +158,7 @@ const detectedGachaUid = ref('');
 const gachaView = ref<'overview' | 'detail' | 'table' | 'versions'>('overview');
 const selectedPoolType = ref('');
 const gachaPlayers = ref<string[]>([]);
+const gachaImportBatches = ref<GachaImportBatch[]>([]);
 const gachaImages = ref<Record<string, string>>({});
 const skipFirstSsr = ref(false);
 const gachaHighContrast = ref(localStorage.getItem('wwbox.gachaHighContrast') === 'true');
@@ -490,6 +492,9 @@ async function syncGachaAccount(): Promise<void> {
     playerId && gachaPlayers.value.includes(playerId)
       ? await window.wwbox.gachaAnalysis.get(playerId)
       : await window.wwbox.gachaAnalysis.get();
+  gachaImportBatches.value = gachaAnalysis.value
+    ? await window.wwbox.gachaAnalysis.batches(gachaAnalysis.value.playerId)
+    : [];
 }
 
 async function loadVersionMetadata(): Promise<void> {
@@ -582,12 +587,13 @@ async function importGachaRecords(): Promise<void> {
     detectedGachaUid.value = result.analysis.playerId;
     await loadGachaImages();
     gachaPlayers.value = await window.wwbox.gachaAnalysis.players();
+    gachaImportBatches.value = await window.wwbox.gachaAnalysis.batches(result.analysis.playerId);
     if (!result.analysis.pools.some((pool) => pool.poolType === selectedPoolType.value))
       selectedPoolType.value =
         result.analysis.pools.find((pool) => pool.total > 0)?.poolType ?? '1';
     gachaMessage.value = {
       type: 'success',
-      text: `已导入并分析 ${gachaAnalysis.value.total} 条唤取记录`,
+      text: `本次新增 ${result.batch.addedCount} 条，重复 ${result.batch.duplicateCount} 条；当前共 ${gachaAnalysis.value.total} 条`,
     };
   } catch (reason) {
     gachaMessage.value = { type: 'error', text: `导入失败：${describeError(reason)}` };
@@ -720,12 +726,34 @@ async function deleteGacha(): Promise<void> {
   await window.wwbox.gachaAnalysis.delete(gachaAnalysis.value.playerId);
   gachaAnalysis.value = null;
   gachaUrl.value = '';
+  gachaImportBatches.value = [];
 }
 async function selectGachaPlayer(playerId: string): Promise<void> {
   gachaAnalysis.value = await window.wwbox.gachaAnalysis.get(playerId);
+  gachaImportBatches.value = await window.wwbox.gachaAnalysis.batches(playerId);
   await loadGachaImages();
   selectedPoolType.value =
     gachaAnalysis.value?.pools.find((pool) => pool.total > 0)?.poolType ?? '1';
+}
+
+async function deleteGachaImportBatch(batch: GachaImportBatch): Promise<void> {
+  if (
+    !window.confirm(
+      `确定删除 ${historyTime(batch.importedAt)} 的这次导入吗？仅此批次独有的记录会被移除。`,
+    )
+  )
+    return;
+  try {
+    await window.wwbox.gachaAnalysis.deleteBatch(batch.id);
+    const analysis = await window.wwbox.gachaAnalysis.get(batch.playerId);
+    gachaAnalysis.value = analysis?.total ? analysis : null;
+    gachaImportBatches.value = await window.wwbox.gachaAnalysis.batches(batch.playerId);
+    gachaPlayers.value = await window.wwbox.gachaAnalysis.players();
+    await loadGachaImages();
+    gachaMessage.value = { type: 'success', text: '已删除该次导入并重新分析记录。' };
+  } catch (reason) {
+    gachaMessage.value = { type: 'error', text: `删除导入失败：${describeError(reason)}` };
+  }
 }
 
 async function selectGachaUid(playerId: string, event?: Event): Promise<void> {
@@ -1868,7 +1896,7 @@ onUnmounted(() => {
           <header class="player-card-header">
             <div class="player-identity">
               <span class="player-avatar">
-                <HighQualityImage
+                <img
                   v-if="currentLauncherAccount?.avatarUrl"
                   :src="currentLauncherAccount.avatarUrl"
                   alt="用户头像"
@@ -2312,6 +2340,48 @@ onUnmounted(() => {
             popover
           >
             暂无链接记录
+          </div>
+        </div>
+        <div class="url-history">
+          <button
+            type="button"
+            class="gacha-popover-trigger"
+            popovertarget="import-history-popover"
+          >
+            <span>导入记录</span><b>{{ gachaImportBatches.length }}</b>
+          </button>
+          <div
+            v-if="gachaImportBatches.length"
+            id="import-history-popover"
+            class="url-history-popover"
+            :data-theme="gachaHighContrast ? 'contrast' : themeStyle"
+            popover
+          >
+            <header><strong>导入记录管理</strong><small>删除后会自动重新分析</small></header>
+            <div v-for="batch in gachaImportBatches" :key="batch.id" class="url-history-row">
+              <button type="button" :title="batch.importedAt">
+                <i :class="batch.source">{{ batch.source === 'game' ? '游戏链接' : '手动链接' }}</i
+                ><span>新增 {{ batch.addedCount }} 条 · 重复 {{ batch.duplicateCount }} 条</span
+                ><time>{{ historyTime(batch.importedAt) }}</time>
+              </button>
+              <button
+                class="history-delete"
+                type="button"
+                title="删除该次导入"
+                @click="deleteGachaImportBatch(batch)"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          <div
+            v-else
+            id="import-history-popover"
+            class="url-history-empty"
+            :data-theme="gachaHighContrast ? 'contrast' : themeStyle"
+            popover
+          >
+            暂无导入记录
           </div>
         </div>
       </div>

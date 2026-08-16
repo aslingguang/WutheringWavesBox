@@ -226,6 +226,14 @@ const api: DesktopApi = {
       ipcRenderer.invoke('gachaAnalysis.delete', playerId) as ReturnType<
         DesktopApi['gachaAnalysis']['delete']
       >,
+    batches: (playerId) =>
+      ipcRenderer.invoke('gachaAnalysis.batches', playerId) as ReturnType<
+        DesktopApi['gachaAnalysis']['batches']
+      >,
+    deleteBatch: (batchId) =>
+      ipcRenderer.invoke('gachaAnalysis.deleteBatch', batchId) as ReturnType<
+        DesktopApi['gachaAnalysis']['deleteBatch']
+      >,
     snapshot: (png) =>
       ipcRenderer.invoke('gachaAnalysis.snapshot', png) as ReturnType<
         DesktopApi['gachaAnalysis']['snapshot']

@@ -36,6 +36,46 @@ describe('GachaRepository', () => {
     expect(result.pools.find((pool) => pool.poolType === '3')).toMatchObject({ total: 0, pity: 0 });
   });
 
+  it('can remove one import without deleting records shared by another import', () => {
+    repository = new GachaRepository(':memory:');
+    const base = {
+      recordOrder: 0,
+      playerId: '123456789',
+      poolType: '1',
+      resourceId: 100,
+      qualityLevel: 3,
+      resourceType: '武器',
+      name: '测试武器',
+      time: '2026-01-01 12:00:00',
+    };
+    const first = repository.import(
+      [
+        { ...base, recordId: 'shared' },
+        { ...base, recordId: 'first-only', resourceId: 101 },
+      ],
+      'manual',
+    );
+    const second = repository.import(
+      [
+        { ...base, recordId: 'shared' },
+        { ...base, recordId: 'second-only', resourceId: 102 },
+      ],
+      'game',
+    );
+    expect(first).toMatchObject({ addedCount: 2, duplicateCount: 0 });
+    expect(second).toMatchObject({ addedCount: 1, duplicateCount: 1 });
+    repository.deleteBatch(first.id);
+    expect(
+      repository
+        .analysis(base.playerId)
+        .recentRecords.map((item) => item.recordId)
+        .sort(),
+    ).toEqual(['second-only', 'shared']);
+    expect(repository.batches(base.playerId)).toHaveLength(1);
+    repository.deleteBatch(second.id);
+    expect(repository.analysis(base.playerId).total).toBe(0);
+  });
+
   it('keeps distinct server records even when item and timestamp are identical', () => {
     repository = new GachaRepository(':memory:');
     const base = {
@@ -159,19 +199,33 @@ describe('GachaRepository', () => {
     repository = new GachaRepository(':memory:');
     repository.upsert([
       {
-        recordId: 'future-limited', recordOrder: 0, playerId: '123456789', poolType: '1',
-        resourceId: 1999, qualityLevel: 5, resourceType: '角色', name: '未来限定角色',
+        recordId: 'future-limited',
+        recordOrder: 0,
+        playerId: '123456789',
+        poolType: '1',
+        resourceId: 1999,
+        qualityLevel: 5,
+        resourceType: '角色',
+        name: '未来限定角色',
         time: '2030-01-01 12:00:00',
       },
       {
-        recordId: 'future-standard', recordOrder: 1, playerId: '123456789', poolType: '1',
-        resourceId: 1104, qualityLevel: 5, resourceType: '角色', name: '忌炎之外的常驻角色',
+        recordId: 'future-standard',
+        recordOrder: 1,
+        playerId: '123456789',
+        poolType: '1',
+        resourceId: 1104,
+        qualityLevel: 5,
+        resourceType: '角色',
+        name: '忌炎之外的常驻角色',
         time: '2030-01-01 12:01:00',
       },
     ]);
     expect(
-      repository.analysis('123456789').pools.find((item) => item.poolType === '1')?.fiveStars
-        .map((star) => star.featured),
+      repository
+        .analysis('123456789')
+        .pools.find((item) => item.poolType === '1')
+        ?.fiveStars.map((star) => star.featured),
     ).toEqual([false, true]);
   });
 

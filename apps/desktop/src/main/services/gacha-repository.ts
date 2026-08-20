@@ -48,7 +48,7 @@ export class GachaRepository {
     this.normalizeStoredPoolTypes();
   }
   upsert(records: GachaRecord[]): void {
-    this.store(records);
+    this.store(records, undefined, false);
   }
   import(records: GachaRecord[], source: GachaImportBatch['source']): GachaImportBatch {
     if (!records.length) throw new Error('GACHA_RECORDS_EMPTY');
@@ -64,7 +64,7 @@ export class GachaRepository {
           'INSERT INTO gacha_import_batches(id,player_id,imported_at,source,record_count,added_count,duplicate_count) VALUES(?,?,?,?,?,?,?)',
         )
         .run(id, playerId, importedAt, source, records.length, 0, 0);
-      const addedCount = this.store(records, id);
+      const addedCount = this.store(records, id, true);
       const batch: GachaImportBatch = {
         id,
         playerId,
@@ -135,7 +135,7 @@ export class GachaRepository {
       throw error;
     }
   }
-  private store(records: GachaRecord[], batchId?: string): number {
+  private store(records: GachaRecord[], batchId?: string, mergeOverlap = false): number {
     const statement = this.database.prepare(
       `INSERT INTO gacha_records(record_id,record_order,player_id,pool_type,resource_id,quality_level,resource_type,name,time,imported_at)
        VALUES(?,?,?,?,?,?,?,?,?,?) ON CONFLICT(player_id,pool_type,record_id) DO UPDATE SET
@@ -160,9 +160,12 @@ export class GachaRepository {
     const inTransaction = Boolean(batchId);
     if (!inTransaction) this.database.exec('BEGIN IMMEDIATE');
     try {
-      for (const r of deduplicateRecords(records)) {
+      const incoming = mergeOverlap
+        ? this.mergeOverlappingRecords(records)
+        : deduplicateRecords(records);
+      for (const r of incoming) {
         const poolType = normalizePoolType(r.poolType);
-        if (!r.recordId.startsWith('legacy|')) {
+        if (!mergeOverlap && !r.recordId.startsWith('legacy|')) {
           const legacy = findLegacy.get(r.playerId, poolType, r.resourceId, r.name, r.time) as
             { record_id: string } | undefined;
           adoptLegacy.run(
@@ -200,6 +203,60 @@ export class GachaRepository {
       if (!inTransaction) this.database.exec('ROLLBACK');
       throw e;
     }
+  }
+
+  /**
+   * The API exposes a newest-to-oldest slice but its record id is not stable.
+   * As in the reference tool, the new slice replaces the already-known range
+   * down to its oldest timestamp; only records older than that stay local.
+   */
+  private mergeOverlappingRecords(records: GachaRecord[]): GachaRecord[] {
+    const grouped = new Map<string, GachaRecord[]>();
+    for (const record of deduplicateRecords(records)) {
+      const poolType = normalizePoolType(record.poolType);
+      const key = `${record.playerId}\u0000${poolType}`;
+      grouped.set(key, [...(grouped.get(key) ?? []), { ...record, poolType }]);
+    }
+    const findExisting = this.database.prepare(
+      `SELECT record_id,record_order,player_id,pool_type,resource_id,quality_level,resource_type,name,time
+       FROM gacha_records WHERE player_id=? AND pool_type=? AND time>=?
+       ORDER BY time DESC,record_order ASC,record_id ASC`,
+    );
+    const removeLinks = this.database.prepare(
+      'DELETE FROM gacha_batch_records WHERE player_id=? AND pool_type=? AND record_id=?',
+    );
+    const removeRecord = this.database.prepare(
+      'DELETE FROM gacha_records WHERE player_id=? AND pool_type=? AND record_id=?',
+    );
+    const merged: GachaRecord[] = [];
+    for (const values of grouped.values()) {
+      const first = values[0];
+      if (!first) continue;
+      const cutoff = values.reduce(
+        (oldest, record) => (record.time < oldest ? record.time : oldest),
+        first.time,
+      );
+      const oldRows = findExisting.all(first.playerId, first.poolType, cutoff) as unknown as Row[];
+      const candidates = new Map<string, Row[]>();
+      for (const row of oldRows) {
+        const key = recordIdentity(mapRow(row));
+        candidates.set(key, [...(candidates.get(key) ?? []), row]);
+      }
+      const matched = new Set<string>();
+      for (const record of values) {
+        const candidate = candidates.get(recordIdentity(record))?.shift();
+        if (candidate) {
+          matched.add(candidate.record_id);
+          merged.push({ ...record, recordId: candidate.record_id });
+        } else merged.push(record);
+      }
+      for (const row of oldRows) {
+        if (matched.has(row.record_id)) continue;
+        removeLinks.run(row.player_id, row.pool_type, row.record_id);
+        removeRecord.run(row.player_id, row.pool_type, row.record_id);
+      }
+    }
+    return merged;
   }
   latestPlayerId(): string | null {
     const row = this.database
@@ -352,6 +409,15 @@ function deduplicateRecords(records: GachaRecord[]): GachaRecord[] {
     if (!unique.has(key)) unique.set(key, record);
   }
   return [...unique.values()];
+}
+function recordIdentity(record: GachaRecord): string {
+  return [
+    record.time,
+    record.resourceId,
+    record.qualityLevel,
+    record.resourceType,
+    record.name,
+  ].join('\u0000');
 }
 function mapRow(row: Row): GachaRecord {
   return {

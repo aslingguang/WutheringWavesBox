@@ -76,6 +76,85 @@ describe('GachaRepository', () => {
     expect(repository.analysis(base.playerId).total).toBe(0);
   });
 
+  it('replaces an overlapping API time window even when record ids change', () => {
+    repository = new GachaRepository(':memory:');
+    const base = {
+      playerId: '123456789',
+      poolType: '1',
+      qualityLevel: 3,
+      resourceType: '武器',
+    };
+    const first = repository.import(
+      [
+        {
+          ...base,
+          recordId: 'old-a',
+          recordOrder: 0,
+          resourceId: 1,
+          name: 'A',
+          time: '2026-01-03 12:00:00',
+        },
+        {
+          ...base,
+          recordId: 'old-b',
+          recordOrder: 1,
+          resourceId: 2,
+          name: 'B',
+          time: '2026-01-02 12:00:00',
+        },
+        {
+          ...base,
+          recordId: 'archived',
+          recordOrder: 2,
+          resourceId: 3,
+          name: 'C',
+          time: '2026-01-01 12:00:00',
+        },
+      ],
+      'manual',
+    );
+    const second = repository.import(
+      [
+        {
+          ...base,
+          recordId: 'new-a',
+          recordOrder: 1,
+          resourceId: 1,
+          name: 'A',
+          time: '2026-01-03 12:00:00',
+        },
+        {
+          ...base,
+          recordId: 'new-b',
+          recordOrder: 2,
+          resourceId: 2,
+          name: 'B',
+          time: '2026-01-02 12:00:00',
+        },
+        {
+          ...base,
+          recordId: 'new-d',
+          recordOrder: 0,
+          resourceId: 4,
+          name: 'D',
+          time: '2026-01-04 12:00:00',
+        },
+      ],
+      'game',
+    );
+    expect(second).toMatchObject({ addedCount: 1, duplicateCount: 2 });
+    expect(repository.analysis(base.playerId).total).toBe(4);
+    repository.deleteBatch(second.id);
+    expect(
+      repository
+        .analysis(base.playerId)
+        .recentRecords.map((record) => record.recordId)
+        .sort(),
+    ).toEqual(['archived', 'old-a', 'old-b']);
+    repository.deleteBatch(first.id);
+    expect(repository.analysis(base.playerId).total).toBe(0);
+  });
+
   it('keeps distinct server records even when item and timestamp are identical', () => {
     repository = new GachaRepository(':memory:');
     const base = {

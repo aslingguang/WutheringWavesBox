@@ -169,11 +169,8 @@ public static class GameInstallationService
             if (File.Exists(launcherConfig))
             {
                 using var document = JsonDocument.Parse(File.ReadAllText(launcherConfig));
-                if (document.RootElement.TryGetProperty("version", out var versionElement))
-                {
-                    var version = versionElement.GetString();
-                    if (!string.IsNullOrWhiteSpace(version)) return version;
-                }
+                var version = ReadLauncherConfigVersion(document.RootElement);
+                if (!string.IsNullOrWhiteSpace(version)) return version;
             }
         }
         catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
@@ -193,6 +190,57 @@ public static class GameInstallationService
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// 官方启动器按资源包安装游戏：配置中的顶层 version 是基础版本，
+    /// bundles.*.version 才是实际安装的客户端版本（例如基础 3.7.0 搭配 HD 资源包 3.7.1）。
+    /// 远端启动器索引发布的是资源包版本，因此优先使用最高的资源包版本进行比较，
+    /// 避免把已经更新的客户端误判为可更新。没有资源包信息时退回基础版本。
+    /// </summary>
+    private static string? ReadLauncherConfigVersion(JsonElement root)
+    {
+        if (root.ValueKind != JsonValueKind.Object) return null;
+
+        var bundleVersions = new List<string>();
+        if (root.TryGetProperty("bundles", out var bundles) && bundles.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var bundle in bundles.EnumerateObject())
+            {
+                if (bundle.Value.ValueKind != JsonValueKind.Object) continue;
+                if (!bundle.Value.TryGetProperty("version", out var versionElement) ||
+                    versionElement.ValueKind != JsonValueKind.String) continue;
+                var bundleVersion = versionElement.GetString();
+                if (!string.IsNullOrWhiteSpace(bundleVersion)) bundleVersions.Add(bundleVersion.Trim());
+            }
+        }
+
+        if (bundleVersions.Count > 0)
+        {
+            var newest = bundleVersions[0];
+            foreach (var candidate in bundleVersions.Skip(1))
+            {
+                if (CompareVersions(candidate, newest) > 0) newest = candidate;
+            }
+            return newest;
+        }
+
+        if (root.TryGetProperty("version", out var baseVersionElement) &&
+            baseVersionElement.ValueKind == JsonValueKind.String)
+        {
+            var baseVersion = baseVersionElement.GetString();
+            if (!string.IsNullOrWhiteSpace(baseVersion)) return baseVersion.Trim();
+        }
+
+        return null;
+    }
+
+    private static int CompareVersions(string left, string right)
+    {
+        var leftValid = Version.TryParse(left, out var leftVersion);
+        var rightValid = Version.TryParse(right, out var rightVersion);
+        if (leftValid && rightValid) return leftVersion!.CompareTo(rightVersion);
+        return leftValid ? 1 : rightValid ? -1 : 0;
     }
 
     private static string CreateId(string rootPath)

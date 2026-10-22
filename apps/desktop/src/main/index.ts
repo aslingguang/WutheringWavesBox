@@ -45,6 +45,7 @@ import type {
   KuroResourcePeriodType,
   UpdateKuroAccountInput,
 } from '@wwbox/contracts';
+import { isValidCustomLaunchArguments, normalizeCustomLaunchArguments } from '@wwbox/contracts';
 import { HelperClient } from './services/helper-client';
 import { GameInstallationRepository } from './services/game-installation-repository';
 import { GameVersionService } from './services/game-version-service';
@@ -589,7 +590,10 @@ function registerIpc(): void {
     assertTrustedSender(event.sender);
     if (!isLaunchGameInput(input)) throw new Error('INVALID_ARGUMENT');
     if (!helperClient) throw new Error('HELPER_UNAVAILABLE');
-    return helperClient.launchGame(input);
+    return helperClient.launchGame({
+      ...input,
+      customArguments: normalizeCustomLaunchArguments(input.customArguments),
+    });
   });
 
   ipcMain.handle(
@@ -1120,7 +1124,8 @@ function isLaunchGameInput(value: unknown): value is LaunchGameInput {
     (input.renderMode === 'default' ||
       input.renderMode === 'dx11' ||
       input.renderMode === 'dx12') &&
-    displaySettingsValid
+    displaySettingsValid &&
+    isValidCustomLaunchArguments(input.customArguments)
   );
 }
 

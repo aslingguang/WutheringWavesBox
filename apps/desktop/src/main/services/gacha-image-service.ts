@@ -84,8 +84,7 @@ export class GachaImageService {
     ]) {
       try {
         const bytes = readFileSync(path);
-        if (bytes.length >= 100)
-          return `data:image/png;base64,${bytes.toString('base64')}`;
+        if (bytes.length >= 100) return `data:image/png;base64,${bytes.toString('base64')}`;
       } catch {
         // Continue through the independent official avatar caches.
       }

@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { toBlob } from 'html-to-image';
-import { GACHA_VERSION_METADATA, findGachaVersion } from '@wwbox/contracts';
+import {
+  GACHA_VERSION_METADATA,
+  MAX_CUSTOM_LAUNCH_ARGUMENTS_LENGTH,
+  findGachaVersion,
+  isValidCustomLaunchArguments,
+  normalizeCustomLaunchArguments,
+} from '@wwbox/contracts';
 import energyIcon from './assets/game-info/energy.png';
 import storeEnergyIcon from './assets/game-info/store-energy.png';
 import livenessIcon from './assets/game-info/liveness.png';
@@ -109,7 +115,6 @@ const renderMode = ref<GameRenderMode>('default');
 const processStates = ref<Record<string, GameProcessState>>({});
 const launchingId = ref<string | null>(null);
 const updatingId = ref<string | null>(null);
-const openingLauncherId = ref<string | null>(null);
 const stoppingGame = ref(false);
 const versionStates = ref<Record<string, GameVersionState>>({});
 const checkingVersions = ref(false);
@@ -118,6 +123,7 @@ type QuickGameSettings = {
   width: number;
   height: number;
   renderMode: GameRenderMode;
+  customArguments: string;
 };
 const quickSettingsCollapsed = ref(localStorage.getItem('wwbox.quickSettingsCollapsed') === 'true');
 const quickSettingsInstallationId = ref('');
@@ -197,6 +203,15 @@ const editableQuickSettings = computed(() =>
   quickSettingsProfileId.value === 'general'
     ? generalQuickSettings.value
     : (accountQuickSettings.value[quickSettingsProfileId.value] ?? generalQuickSettings.value),
+);
+const customArgumentsLength = computed(
+  () => normalizeCustomLaunchArguments(editableQuickSettings.value.customArguments).length,
+);
+const hasCustomArguments = computed(() => editableQuickSettings.value.customArguments.length > 0);
+const customArgumentsError = computed(() =>
+  isValidCustomLaunchArguments(editableQuickSettings.value.customArguments)
+    ? ''
+    : `最多 ${MAX_CUSTOM_LAUNCH_ARGUMENTS_LENGTH} 个字符，且不能包含换行等控制字符`,
 );
 const activeAccount = computed(() => accounts.value.find((item) => item.active) ?? null);
 const currentPlayerId = computed(
@@ -1136,12 +1151,17 @@ async function toggleRedemptionUsed(code: string, used: boolean): Promise<void> 
 
 async function launchGame(game: GameInstallation): Promise<void> {
   gameError.value = null;
+  const settings = effectiveQuickSettings();
+  const customArguments = normalizeCustomLaunchArguments(settings.customArguments);
+  if (!isValidCustomLaunchArguments(customArguments)) {
+    gameError.value = `自定义启动参数无效：最多 ${MAX_CUSTOM_LAUNCH_ARGUMENTS_LENGTH} 个字符，且不能包含换行等控制字符`;
+    return;
+  }
   launchingId.value = game.id;
   try {
     if (currentLauncherAccount.value?.id) {
       await window.wwbox.account.activateLauncher(currentLauncherAccount.value.id);
     }
-    const settings = effectiveQuickSettings();
     await window.wwbox.game
       .saveDisplaySettings(game.id, {
         displayMode: settings.displayMode,
@@ -1155,24 +1175,16 @@ async function launchGame(game: GameInstallation): Promise<void> {
       displayMode: settings.displayMode,
       width: settings.width,
       height: settings.height,
+      customArguments,
     });
     processStates.value[state.installationId] = state;
   } catch (reason) {
-    gameError.value = describeError(reason);
+    const message = describeError(reason);
+    gameError.value = message.includes('INVALID_ARGUMENT')
+      ? '启动参数无效，请检查自定义参数'
+      : message;
   } finally {
     launchingId.value = null;
-  }
-}
-
-async function openOfficialLauncher(game: GameInstallation): Promise<void> {
-  gameError.value = null;
-  openingLauncherId.value = game.id;
-  try {
-    await window.wwbox.game.openUpdater(game.id);
-  } catch (reason) {
-    gameError.value = describeError(reason);
-  } finally {
-    openingLauncherId.value = null;
   }
 }
 
@@ -1203,11 +1215,6 @@ async function updateGame(game: GameInstallation): Promise<void> {
   } finally {
     updatingId.value = null;
   }
-}
-
-async function runGameAction(game: GameInstallation): Promise<void> {
-  if (versionStates.value[game.id]?.status === 'updateAvailable') await updateGame(game);
-  else await launchGame(game);
 }
 
 async function removeGame(game: GameInstallation): Promise<void> {
@@ -1267,6 +1274,7 @@ async function loadDisplaySettings(): Promise<void> {
         width: displaySettings.value.width,
         height: displaySettings.value.height,
         renderMode: renderMode.value,
+        customArguments: generalQuickSettings.value.customArguments,
       };
       persistQuickSettings();
     }
@@ -1285,8 +1293,17 @@ function selectResolution(value: string): void {
   }
 }
 
+function clearCustomArguments(): void {
+  editableQuickSettings.value.customArguments = '';
+  persistQuickSettings();
+}
+
 async function saveDisplaySettings(): Promise<void> {
   if (!quickSettingsInstallationId.value) return;
+  if (customArgumentsError.value) {
+    displaySettingsMessage.value = customArgumentsError.value;
+    return;
+  }
   displaySettingsSaving.value = true;
   displaySettingsMessage.value = '';
   try {
@@ -1316,11 +1333,17 @@ function readGeneralQuickSettings(): QuickGameSettings {
     const parsed = JSON.parse(
       localStorage.getItem('wwbox.quickGameSettings.general') || '{}',
     ) as Partial<QuickGameSettings>;
-    if (isQuickGameSettings(parsed)) return parsed;
+    if (isQuickGameSettings(parsed)) return withNormalizedArguments(parsed);
   } catch {
     // Invalid local settings fall back to conservative defaults.
   }
-  return { displayMode: 'borderless', width: 1920, height: 1080, renderMode: 'default' };
+  return {
+    displayMode: 'borderless',
+    width: 1920,
+    height: 1080,
+    renderMode: 'default',
+    customArguments: '',
+  };
 }
 
 function readAccountQuickSettings(): Record<string, QuickGameSettings> {
@@ -1329,13 +1352,20 @@ function readAccountQuickSettings(): Record<string, QuickGameSettings> {
       localStorage.getItem('wwbox.quickGameSettings.accounts') || '{}',
     ) as Record<string, unknown>;
     return Object.fromEntries(
-      Object.entries(parsed).filter((entry): entry is [string, QuickGameSettings] =>
-        isQuickGameSettings(entry[1]),
-      ),
+      Object.entries(parsed)
+        .filter((entry): entry is [string, QuickGameSettings] => isQuickGameSettings(entry[1]))
+        .map(([id, settings]) => [id, withNormalizedArguments(settings)]),
     );
   } catch {
     return {};
   }
+}
+
+function withNormalizedArguments(settings: QuickGameSettings): QuickGameSettings {
+  return {
+    ...settings,
+    customArguments: normalizeCustomLaunchArguments(settings.customArguments),
+  };
 }
 
 function isQuickGameSettings(value: unknown): value is QuickGameSettings {
@@ -1353,7 +1383,8 @@ function isQuickGameSettings(value: unknown): value is QuickGameSettings {
     (settings.height ?? 0) <= 8640 &&
     (settings.renderMode === 'default' ||
       settings.renderMode === 'dx11' ||
-      settings.renderMode === 'dx12')
+      settings.renderMode === 'dx12') &&
+    (settings.customArguments === undefined || typeof settings.customArguments === 'string')
   );
 }
 
@@ -1870,11 +1901,44 @@ onUnmounted(() => {
                     @change="persistQuickSettings"
                   />
                 </label>
+                <label class="quick-settings-arguments">
+                  <span>自定义参数</span>
+                  <textarea
+                    v-model="editableQuickSettings.customArguments"
+                    rows="2"
+                    spellcheck="false"
+                    autocomplete="off"
+                    placeholder="-nologo -nosplash"
+                    :aria-invalid="customArgumentsError ? 'true' : undefined"
+                    @change="persistQuickSettings"
+                  />
+                </label>
+                <div class="quick-settings-arguments-meta">
+                  <small>追加在启动命令末尾，可补充或覆盖上方参数</small>
+                  <span>
+                    <small :class="{ 'is-invalid': customArgumentsError }">
+                      {{
+                        customArgumentsError ||
+                        `${customArgumentsLength}/${MAX_CUSTOM_LAUNCH_ARGUMENTS_LENGTH}`
+                      }}
+                    </small>
+                    <button
+                      v-if="hasCustomArguments"
+                      class="quick-settings-arguments-clear"
+                      type="button"
+                      @click="clearCustomArguments"
+                    >
+                      清空
+                    </button>
+                  </span>
+                </div>
                 <button
                   class="primary-button quick-settings-save"
                   type="button"
                   :disabled="
-                    displaySettingsSaving || processStates[quickSettingsInstallationId]?.running
+                    displaySettingsSaving ||
+                    !!customArgumentsError ||
+                    processStates[quickSettingsInstallationId]?.running
                   "
                   @click="saveDisplaySettings"
                 >
@@ -2040,7 +2104,7 @@ onUnmounted(() => {
                 <strong>鸣潮</strong><span>{{ regionName(game.region) }}</span>
               </div>
               <p>{{ game.rootPath }}</p>
-              <small>
+              <small title="本地版本取官方启动器配置中已安装资源包的版本">
                 本地版本 {{ game.localVersion || '暂未识别' }} ·
                 <span :class="`version-${versionStates[game.id]?.status ?? 'unknown'}`">
                   {{ versionStatusText(game) }}
@@ -2061,10 +2125,11 @@ onUnmounted(() => {
               <button
                 class="secondary-button"
                 type="button"
-                :disabled="openingLauncherId === game.id"
-                @click="openOfficialLauncher(game)"
+                title="打开官方启动器检查并安装游戏更新"
+                :disabled="processStates[game.id]?.running || updatingId === game.id"
+                @click="updateGame(game)"
               >
-                {{ openingLauncherId === game.id ? '打开中…' : '官方启动器' }}
+                {{ updatingId === game.id ? '正在打开…' : '更新游戏' }}
               </button>
               <button
                 class="secondary-button stop-game-button"
@@ -2077,24 +2142,16 @@ onUnmounted(() => {
               <button
                 class="primary-button"
                 type="button"
-                :class="{ 'update-button': versionStates[game.id]?.status === 'updateAvailable' }"
-                :disabled="
-                  processStates[game.id]?.running ||
-                  launchingId === game.id ||
-                  updatingId === game.id
-                "
-                @click="runGameAction(game)"
+                title="直接启动游戏，不受版本检测结果影响"
+                :disabled="processStates[game.id]?.running || launchingId === game.id"
+                @click="launchGame(game)"
               >
                 {{
                   processStates[game.id]?.running
                     ? '游戏运行中'
-                    : updatingId === game.id
-                      ? '正在打开启动器…'
-                      : launchingId === game.id
-                        ? '正在启动…'
-                        : versionStates[game.id]?.status === 'updateAvailable'
-                          ? '更新游戏'
-                          : '启动游戏'
+                    : launchingId === game.id
+                      ? '正在启动…'
+                      : '启动游戏'
                 }}
               </button>
             </div>

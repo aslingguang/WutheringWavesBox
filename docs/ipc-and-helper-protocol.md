@@ -117,7 +117,9 @@ Preload 应逐个使用 `ipcRenderer.invoke` 映射方法，禁止提供 `invoke
 
 远端版本检测使用 Main 内部的 `game.checkVersion` IPC。Renderer 只传安装实例 ID，Main 从数据库取得可信区服信息并选择对应启动器索引。请求超时为 5 秒，成功结果缓存 5 分钟；失败返回 `unknown` 状态，不影响游戏启动。
 
-`game.openUpdater` 只接受数据库中的安装实例 ID，由 Main 定位并打开对应官方启动器。当前应用不直接下载或覆盖游戏文件；检测到新版本时将“启动游戏”入口切换为“更新游戏”，实际更新仍交由官方启动器完成。
+本地版本按官方启动器配置 `launcherDownloadConfig.json` 中已安装资源包的版本读取：官方启动器按资源包分发客户端，顶层 `version` 是基础版本，`bundles.*.version` 才是实际安装的客户端版本（例如基础 `3.7.0` 搭配 HD 资源包 `3.7.1`）。Helper 取资源包版本中的最高值，缺失时回退顶层 `version` 或可执行文件元数据；远端版本取启动器索引的 `default.config.version`（与分发版本同源，旧结构回退 `default.version`）。
+
+`game.openUpdater` 只接受数据库中的安装实例 ID，由 Main 定位并打开对应官方启动器。当前应用不直接下载或覆盖游戏文件；主页的“启动游戏”和“更新游戏”是两个独立入口，版本检测结果、检测失败或误判都不会阻止直接启动，实际更新仍交由官方启动器完成。
 
 `account.activateLauncher` 只接受已扫描账户 ID。国服实现会解码 `%APPDATA%/KR_G152/A1381/KRSDKUserCache.json` 的 XOR 9 数据，更新 `last_login_cuid` 并调整 `account_list` 顺序后重新编码；启动游戏前会再次执行同步。Renderer 不接触 OAuth Code、缓存原文或任意路径。当前写入已有自动化样例覆盖，但完整备份、原子替换和失败回滚仍需在发布前补齐。
 
@@ -154,7 +156,8 @@ Electron 主进程提供以下受信任渲染进程接口：
 
 - `game.getDisplaySettings(installationId)`：读取对应安装目录中的 `GameUserSettings.ini`。
 - `game.saveDisplaySettings(installationId, input)`：校验显示模式与分辨率范围，更新配置并保留其他游戏设置。
-- `game.checkVersion(installationId)`：先调用 Helper 的安装校验获取最新本地版本并更新安装仓库，再执行远端版本查询。
-- `game.launch(input)`：可携带 `displayMode`、`width`、`height`。Main 与 Helper 分别校验枚举和数值范围，Helper 只生成固定格式的 `-ResX`、`-ResY`、`-fullscreen`、`-windowed` 和 `-borderless` 参数，不接收任意启动参数。
+- `game.checkVersion(installationId)`：先调用 Helper 的安装校验获取最新本地版本（已安装资源包版本）并更新安装仓库，再执行远端版本查询。
+- `game.launch(input)`：可携带 `displayMode`、`width`、`height` 与可选的 `customArguments`。Main 与 Helper 分别校验枚举、数值范围和自定义参数，Helper 生成固定格式的 `-ResX`、`-ResY`、`-fullscreen`、`-windowed` 和 `-borderless` 参数，并把经过校验的自定义参数追加在末尾。
+- `customArguments` 只用于补充或覆盖启动参数，不能替换游戏可执行文件：两层都会去除首尾空白、限制为 512 个字符并拒绝控制字符（换行、制表符等），非法输入返回 `INVALID_ARGUMENT`。
 
 配置文件优先读取 `Client/Saved/Config/WindowsNoEditor/GameUserSettings.ini`，同时兼容 Unreal 新版本使用的 `Windows` 目录。

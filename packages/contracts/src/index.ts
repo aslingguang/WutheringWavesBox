@@ -42,12 +42,41 @@ export interface GameValidationResult {
 
 export type GameRenderMode = 'default' | 'dx11' | 'dx12';
 
+/** 自定义启动参数的最大长度，Main 与 Helper 按同一上限校验。 */
+export const MAX_CUSTOM_LAUNCH_ARGUMENTS_LENGTH = 512;
+
 export interface LaunchGameInput {
   rootPath: string;
   renderMode: GameRenderMode;
   displayMode?: GameDisplayMode;
   width?: number;
   height?: number;
+  /** 追加在固定显示/渲染参数之后的用户自定义参数。 */
+  customArguments?: string;
+}
+
+/**
+ * 自定义参数只会被追加到固定的游戏可执行文件之后，不能替换可执行文件。
+ * 这里统一限制长度并拒绝控制字符，避免换行或终端控制序列进入命令行。
+ */
+export function isValidCustomLaunchArguments(value: unknown): boolean {
+  if (value === undefined || value === null) return true;
+  if (typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  return trimmed.length <= MAX_CUSTOM_LAUNCH_ARGUMENTS_LENGTH && !hasControlCharacter(trimmed);
+}
+
+function hasControlCharacter(value: string): boolean {
+  for (const character of value) {
+    const code = character.codePointAt(0) ?? 0;
+    if (code < 0x20 || (code >= 0x7f && code <= 0x9f)) return true;
+  }
+  return false;
+}
+
+/** 去掉首尾空白；非字符串输入按空参数处理。 */
+export function normalizeCustomLaunchArguments(value: string | null | undefined): string {
+  return typeof value === 'string' ? value.trim() : '';
 }
 
 export interface GameProcessState {

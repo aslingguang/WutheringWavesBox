@@ -1425,6 +1425,49 @@ h1 {
   margin-top: 2px;
   padding: 7px 14px;
 }
+.quick-settings-panel .quick-settings-arguments {
+  align-items: start;
+}
+.quick-settings-panel .quick-settings-arguments > span {
+  padding-top: 7px;
+}
+.shell .quick-settings-panel .quick-settings-arguments textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  font-family: var(--ui-font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+  resize: vertical;
+}
+.quick-settings-arguments-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 8px;
+  margin: -4px 0 0 76px;
+}
+.quick-settings-arguments-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.quick-settings-arguments-meta small {
+  line-height: 1.4;
+}
+.quick-settings-panel .quick-settings-arguments-meta small.is-invalid {
+  color: var(--t-danger, #ff8d8d);
+}
+.quick-settings-panel .quick-settings-arguments-clear {
+  min-height: 22px;
+  padding: 0 7px;
+  border-radius: 6px !important;
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+}
 .quick-settings-message {
   line-height: 1.45;
 }
@@ -1626,10 +1669,6 @@ h1 {
 .home-content .home-quick-grid {
   width: min(400px, 100%);
   margin-left: auto;
-}
-.update-button {
-  border-color: #e4bd63;
-  background: #e7c56f;
 }
 .home-game-error {
   margin: 0;

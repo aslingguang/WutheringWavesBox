@@ -17,7 +17,11 @@ describe('GachaImageService', () => {
         return new Response(
           JSON.stringify({
             code: 200,
-            data: { results: { records: [{ name, content: { contentUrl: `https://official.test/${name}.png` } }] } },
+            data: {
+              results: {
+                records: [{ name, content: { contentUrl: `https://official.test/${name}.png` } }],
+              },
+            },
           }),
           { status: 200, headers: { 'content-type': 'application/json' } },
         );

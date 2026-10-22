@@ -27,6 +27,34 @@ describe('GameVersionService', () => {
     expect(state.status).toBe('unknown');
     expect(state.remoteVersion).toBeNull();
   });
+
+  it('uses the distributed client version from config instead of the launcher index version', async () => {
+    const fetcher = vi.fn(async () =>
+      Promise.resolve(
+        Response.json({ default: { version: '2.0.0', config: { version: '3.7.1' } } }),
+      ),
+    ) as unknown as typeof fetch;
+    const service = new GameVersionService(fetcher, () => 1_000);
+
+    const current = await service.check(createInstallation('3.7.1'));
+    const outdated = await service.check(createInstallation('3.7.0'));
+
+    expect(current.remoteVersion).toBe('3.7.1');
+    expect(current.status).toBe('latest');
+    expect(outdated.status).toBe('updateAvailable');
+  });
+
+  it('falls back to the top-level index version when config is absent', async () => {
+    const fetcher = vi.fn(async () =>
+      Promise.resolve(Response.json({ default: { version: '3.8.0' } })),
+    ) as unknown as typeof fetch;
+    const service = new GameVersionService(fetcher, () => 1_000);
+
+    const state = await service.check(createInstallation('3.7.1'));
+
+    expect(state.remoteVersion).toBe('3.8.0');
+    expect(state.status).toBe('updateAvailable');
+  });
 });
 
 describe('compareVersions', () => {

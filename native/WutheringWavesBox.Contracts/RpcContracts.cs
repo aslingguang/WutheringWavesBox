@@ -54,7 +54,8 @@ public sealed record LaunchGameParams(
     [property: JsonPropertyName("renderMode")] string? RenderMode,
     [property: JsonPropertyName("displayMode")] string? DisplayMode,
     [property: JsonPropertyName("width")] int? Width,
-    [property: JsonPropertyName("height")] int? Height);
+    [property: JsonPropertyName("height")] int? Height,
+    [property: JsonPropertyName("customArguments")] string? CustomArguments);
 
 public sealed record GetGameProcessStateParams(
     [property: JsonPropertyName("rootPath")] string? RootPath);

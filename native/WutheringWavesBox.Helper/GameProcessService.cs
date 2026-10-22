@@ -14,7 +14,8 @@ public static class GameProcessService
         string renderMode,
         string? displayMode = null,
         int? width = null,
-        int? height = null)
+        int? height = null,
+        string? customArguments = null)
     {
         var validation = GameInstallationService.ValidateInstallation(rootPath);
         if (!validation.Valid || validation.Installation is null)
@@ -33,7 +34,7 @@ public static class GameProcessService
             FileName = installation.ExecutablePath,
             WorkingDirectory = installation.RootPath,
             UseShellExecute = true,
-            Arguments = BuildArguments(renderMode, displayMode, width, height),
+            Arguments = BuildArguments(renderMode, displayMode, width, height, customArguments),
         };
 
         Process process;
@@ -56,22 +57,26 @@ public static class GameProcessService
         string renderMode,
         string? displayMode,
         int? width,
-        int? height)
+        int? height,
+        string? customArguments = null)
     {
         var arguments = new List<string>();
         if (renderMode == "dx11") arguments.Add("-dx11");
         if (renderMode == "dx12") arguments.Add("-dx12");
-        if (displayMode is null || width is null || height is null)
-            return string.Join(' ', arguments);
-
-        arguments.Add($"-ResX={width.Value}");
-        arguments.Add($"-ResY={height.Value}");
-        if (displayMode == "fullscreen") arguments.Add("-fullscreen");
-        else
+        if (displayMode is not null && width is not null && height is not null)
         {
-            arguments.Add("-windowed");
-            if (displayMode == "borderless") arguments.Add("-borderless");
+            arguments.Add($"-ResX={width.Value}");
+            arguments.Add($"-ResY={height.Value}");
+            if (displayMode == "fullscreen") arguments.Add("-fullscreen");
+            else
+            {
+                arguments.Add("-windowed");
+                if (displayMode == "borderless") arguments.Add("-borderless");
+            }
         }
+
+        var custom = LaunchArgumentPolicy.Normalize(customArguments);
+        if (custom.Length > 0) arguments.Add(custom);
         return string.Join(' ', arguments);
     }
 

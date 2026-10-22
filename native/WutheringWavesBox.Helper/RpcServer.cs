@@ -91,7 +91,8 @@ public sealed class RpcServer(TextReader input, TextWriter output)
             (parameters?.DisplayMode is "fullscreen" or "borderless" or "windowed" &&
              parameters.Width is >= 640 and <= 16384 && parameters.Height is >= 480 and <= 8640);
         if (string.IsNullOrWhiteSpace(parameters?.RootPath) || parameters.RootPath.Length > 1_024 ||
-            parameters.RenderMode is not ("default" or "dx11" or "dx12") || !displaySettingsValid)
+            parameters.RenderMode is not ("default" or "dx11" or "dx12") || !displaySettingsValid ||
+            !LaunchArgumentPolicy.IsValid(parameters.CustomArguments))
             return Failure(request.Id, "INVALID_ARGUMENT", "游戏启动参数无效");
 
         try
@@ -103,7 +104,8 @@ public sealed class RpcServer(TextReader input, TextWriter output)
                     parameters.RenderMode,
                     parameters.DisplayMode,
                     parameters.Width,
-                    parameters.Height));
+                    parameters.Height,
+                    parameters.CustomArguments));
         }
         catch (GameProcessException exception)
         {

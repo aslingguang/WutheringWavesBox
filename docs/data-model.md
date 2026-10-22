@@ -12,15 +12,15 @@
 
 ### `game_installations`
 
-| 字段               | 类型         | 说明            |
-| ------------------ | ------------ | --------------- |
-| `id`               | TEXT PK      | UUID/ULID       |
-| `name`             | TEXT         | 显示名称        |
-| `region`           | TEXT         | `cn` / `global` |
-| `root_path`        | TEXT         | 游戏根目录      |
-| `executable_path`  | TEXT         | 可执行文件      |
-| `local_version`    | TEXT NULL    | 最近读取版本    |
-| `last_verified_at` | INTEGER NULL | 最近验证时间    |
+| 字段               | 类型         | 说明                                 |
+| ------------------ | ------------ | ------------------------------------ |
+| `id`               | TEXT PK      | UUID/ULID                            |
+| `name`             | TEXT         | 显示名称                             |
+| `region`           | TEXT         | `cn` / `global`                      |
+| `root_path`        | TEXT         | 游戏根目录                           |
+| `executable_path`  | TEXT         | 可执行文件                           |
+| `local_version`    | TEXT NULL    | 最近读取的已安装客户端（资源包）版本 |
+| `last_verified_at` | INTEGER NULL | 最近验证时间                         |
 
 该表已在 Electron Main 中使用 Node 24 内置 SQLite 实现。数据库位于 Electron `userData/data.db`，启用 WAL 与外键约束；自动探测和手动选择使用相同 ID 幂等更新。移除安装记录只删除数据库行，不操作游戏文件。
 

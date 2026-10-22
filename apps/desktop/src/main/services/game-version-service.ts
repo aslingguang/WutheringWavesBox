@@ -16,7 +16,8 @@ const INDEX_URLS: Record<Exclude<GameRegion, 'unknown'>, string> = {
 };
 
 interface LauncherIndex {
-  default?: { version?: unknown };
+  version?: unknown;
+  config?: { version?: unknown };
 }
 
 interface CacheEntry {
@@ -60,14 +61,25 @@ export class GameVersionService {
       signal: AbortSignal.timeout(5_000),
     });
     if (!response.ok) throw new Error(`REMOTE_VERSION_HTTP_${response.status}`);
-    const data = (await response.json()) as LauncherIndex;
-    const version = data.default?.version;
-    if (typeof version !== 'string' || !/^\d+(?:\.\d+){1,3}$/.test(version)) {
-      throw new Error('REMOTE_VERSION_INVALID');
-    }
+    const data = (await response.json()) as { default?: LauncherIndex };
+    const version = readLauncherVersion(data.default);
+    if (version === null) throw new Error('REMOTE_VERSION_INVALID');
     this.cache.set(url, { version, expiresAt: this.now() + 5 * 60 * 1_000 });
     return version;
   }
+}
+
+/**
+ * 启动器索引里 config.version 是当前分发的客户端资源包版本，
+ * 与 Helper 从 launcherDownloadConfig.json 读取的 bundles.*.version 同源；
+ * 顶层 version 作为旧版结构或缺失时的回退值。
+ */
+function readLauncherVersion(index: LauncherIndex | undefined): string | null {
+  const candidates = [index?.config?.version, index?.version];
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && /^\d+(?:\.\d+){1,3}$/.test(candidate)) return candidate;
+  }
+  return null;
 }
 
 export function compareVersions(

@@ -54,6 +54,36 @@ public sealed class RpcServerTests
     }
 
     [Fact]
+    public void OversizedCustomArgumentsAreRejected()
+    {
+        var payload = new
+        {
+            jsonrpc = "2.0",
+            protocolVersion = 2,
+            id = "test",
+            method = "game.launch",
+            @params = new
+            {
+                rootPath = "C:/Games",
+                renderMode = "default",
+                customArguments = new string('a', 600),
+            },
+        };
+        var response = RpcServer.Handle(JsonSerializer.Serialize(payload));
+
+        Assert.Equal("INVALID_ARGUMENT", response.Error?.Code);
+    }
+
+    [Fact]
+    public void MultiLineCustomArgumentsAreRejected()
+    {
+        var response = RpcServer.Handle(
+            """{"jsonrpc":"2.0","protocolVersion":2,"id":"test","method":"game.launch","params":{"rootPath":"C:/Games","renderMode":"default","customArguments":"-dx12\n-dx11"}}""");
+
+        Assert.Equal("INVALID_ARGUMENT", response.Error?.Code);
+    }
+
+    [Fact]
     public void MissingProcessStatePathIsRejected()
     {
         var response = RpcServer.Handle(
